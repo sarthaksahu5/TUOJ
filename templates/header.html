@@ -123,6 +123,15 @@
 
 <body>
 
+
+    <div class="border-row" style="width:100%"; margin-border: 15px;"></div>
+
+    <div class="container-fluid" align="center" style ="min-height: 100%">
+
+    {% block body %}{% endblock %}
+
+    </div>
+
 	<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
 	<script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
 
