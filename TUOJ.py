@@ -1,52 +1,27 @@
-from sqlalchemy import ForeignKey, Column, String, INTEGER, DateTime, Float
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
-from sqlalchemy import create_engine
-from datetime import datetime
+from flask import Flask, render_template
 
-Base = declarative_base()
+app = Flask(__name__)
 
-class Register(Base):
-    __tablename__ = 'register'
 
-    user_name = Column(String, primary_key=True)
-    roll_no = Column(INTEGER, unique=True)
-    first_name = Column(String, nullable=False)
-    last_name = Column(String)
-    college = Column(String, nullable=False)
-    email = Column(String, unique=True)
+@app.route('/')
+def homepage():
+    return render_template("main.html")
 
-class Profile(Base):
-    __tablename__ = 'profile'
 
-    uid = Column(INTEGER, autoincrement=True, primary_key=True)
-    user_name = Column(String, ForeignKey('register.user_name'))
-    register = relationship('Register')
-    city = Column(String)
-    CTE = Column(INTEGER, default=0)
-    TLE = Column(INTEGER, default=0)
-    SIGSEGV = Column(INTEGER, default=0)
-    WA = Column(INTEGER, default=0)
-    Correct_Answer = Column(INTEGER, default=0)
+@app.route('/dashboard/')
+def dashboard():
+    return render_template("dashboard.html")
 
-class Problem(Base):
-    __tablename__ = 'problem'
 
-    problem_id = Column(String, primary_key=True)
-    difficulty = Column(String, nullable=False)
-    tags = Column(String, nullable=False)
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template("404.html")
 
-class Submission(Base):
-    __tablename__ = 'submission'
 
-    submission_no = Column(INTEGER, autoincrement=True, primary_key=True)
-    user_name = Column(String, ForeignKey('register.user_name'))
-    register = relationship(Register)
-    problem_id = Column(String, ForeignKey('problem.problem_id'))
-    problem = relationship(Problem)
-    status = Column(String, nullable=False)
-    submission_time = Column(DateTime, nullable=False, default=datetime.now())
-    memory_used = (Float)
+@app.route('/login/', methods=["GET", "POST"])
+def login_page():
+    return render_template("login.html")
 
-engine = create_engine('sqlite:///tuoj1.db')
-Base.metadata.create_all(engine)
+
+if __name__ == "__main__":
+    app.run()
