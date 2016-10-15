@@ -10,130 +10,76 @@
 
 <header>
 	<div class="navbar-header">
-      <a class="navbar-brand" href="/">
-	  <img style="max-width:120px; margin-top: -7px; height: 44px" src="{{ url_for('static', filename='images/tu_logo.png') }}">
-	  </a>
-    </div>
+    <a class="navbar-brand" rel="home" href="/" title="Python Programming Tutorials ">
+        <img style="max-width:120px; margin-top: -7px; height: 44px" src="{{ url_for('static', filename='images/tu_logo.png') }}">
+    </a>
+  </div>
 
-
-	<div class = "container-fluid">
-
-		<a href="/dashboard/"><button type="button" class="btn btn-primary" aria-label="Left Align" style="margin-top: 5px; margin-bottom: 5px; height: 44px; margin-right: 15px">
-		  <span class="glyphicon glyphicon-off" aria-hidden="true"></span> Start Coding
+  <div class="container-fluid">
+	<ul class="nav nav-pills">
+		<a href="/dashboard/"><button type="button" class="btn btn-primary" style=" margin-top: 5px; margin-bottom: 5px; height:44px; margin-right: 15px">
+			<span class="glyphicon glyphicon-off"></span> Start Coding
 		</button></a>
-
-
-
-	<ul class="nav navbar-nav navbar-right">
-
-		  <div style="margin-right: 10px; margin-left: 15px; margin-top: 5px; margin-bottom: 5px;"  class="container-fluid">
-			<h5>
-			<a role="presentation" data-toggle="modal" data-target="#exampleModal" href="#"><span class="glyphicon glyphicon-log-in"></span> Login   </a>
-
-			<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-			  <div class="modal-dialog">
-				<div class="modal-content">
-				  <div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-					<h4 class="modal-title" id="exampleModalLabel">Login</h4>
-				  </div>
-				  <div class="modal-body">
-					  <div class="container-fluid">
-						  <form action="" class="form-inline" method="post">
-							<input type="text" class="form-control" placeholder="Username" name="username" value="">
-							 <input type="password" class="form-control" placeholder="Password" name="password" value="">
-							<input class="btn btn-primary" type="submit" value="Login">
-						  </form>
-
-							<div class="container">
-							<br>
-						   <p>No account? <a href='/register'>Register here</a>.</p>
-						   <br>
-
-						  </div>
-					</div>
-				  </div>
-
-				</div>
-			  </div>
-			</div>
-
-		<a role="presentation" class="active" data-toggle="modal" data-target="#register" href="#"><span class="glyphicon glyphicon-pencil"></span> Sign up</a><h5>
-		<div class="modal fade" id="register" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-		  <div class="modal-dialog">
-			<div class="modal-content">
-			  <div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-				<h4 class="modal-title" id="exampleModalLabel">Register</h4>
-			  </div>
-			  <div class="modal-body">
-				  <div class="container">
-
-						<form method=post action="/register">
-						  <dl>
-
-  <dt><label for="username">Username</label>
-  <dd><input id="username" name="username" type="text" value="">
-
-  </dd>
-
-
-  <dt><label for="email">Email Address</label>
-  <dd><input id="email" name="email" type="text" value="">
-
-  </dd>
-
-
-  <dt><label for="password">New Password</label>
-  <dd><input id="password" name="password" type="password" value="">
-
-  </dd>
-
-
-  <dt><label for="confirm">Repeat Password</label>
-  <dd><input id="confirm" name="confirm" type="password" value="">
-
-  </dd>
-
-
-  <dt><label for="accept_tos">I accept the <a href="/about/tos" target="blank">Terms of Service</a> and <a href="/about/privacy-policy" target="blank">Privacy Notice</a> (updated Jan 22, 2015)</label>
-  <dd><input id="accept_tos" name="accept_tos" type="checkbox" value="y">
-
-  </dd>
-
-						  </dl>
-						  <p><input type=submit value=Register>
-						</form>
-
-				</div>
-			  </div>
-
-			</div>
-		  </div>
+      <ul class="nav navbar-nav navbar-right">
+	  {% if session.logged_in %}
+		<div style="margin-right: 10px; margin-left: 15px;  margin-top: 5px; margin-bottom: 5px;" class="container-fluid">
+		<a href="/logout/"><span class="glyphicon glyphicon-log-out"></span> Logout</a></h5>
 		</div>
+	  {% else %}
+	  <div style="margin-right: 10px; margin-left: 15px; margin-top: 5px; margin-bottom: 5px;" class="container-fluid">
+		<a href="/login/"> <span class="glyphicon glyphicon-log-in"></span> Login</a>&nbsp;&nbsp;&nbsp;
+		<a href="/register/" ><span class="glyphicon glyphicon-pencil"></span> Sign up</a></h5>
 	  </div>
-
+	  {% endif %}
       </ul>
-
 	</ul>
-
-	</div>
-
+  </div>
 </header>
 
 <body>
 
+<body>
+	<div class="border-row" style="width:100%; margin-bottom: 15px;"> </div>
+	<!-- Flashed messages and actual body content -->
+	<div class="container-fluid" style="min-height:100%; margin-bottom: 100px;">
+		{% with messages = get_flashed_messages() %}
+		  {% if messages %}
+			{% for message in messages %}
+			<div class="row">
+				<div class="col-md-2"></div>
+				<div class="col-md-8">
+			
+			{% if "type" in message %}
+				  <div class="alert alert-{{message[1]}} alert-dismissible" role="alert">
+					  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					  {{ message[2] }}
+				  </div>
+			
+			{% else %}
+			
+				  <div class="alert alert-warning alert-dismissible" role="alert">
+					  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					  {{ message }}
+				  </div>
+			{% endif %}
+				</div>
+			</div>
+			
+			{% endfor %}
+		  {% endif %}
+		{% endwith %}
+		
 
-    <div class="border-row" style="width:100%"; margin-border: 15px;"></div>
+		<!-- specific page content below -->
+		{% block body %}{% endblock %}
+		
+	</div>
 
-    <div class="container-fluid" align="center" style ="min-height: 100%">
 
-    {% block body %}{% endblock %}
-
-    </div>
-
-	<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
-	<script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+	<script src="//code.jquery.com/jquery-1.11.1.min.js">	
+	</script>
+	<script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}">
+	</script>
 
 </body>
 
