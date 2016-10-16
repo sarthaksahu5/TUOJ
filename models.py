@@ -3,7 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
 from datetime import datetime
-import re
+import bcrypt, re
 
 Base = declarative_base()
 
@@ -16,14 +16,20 @@ class Register(Base):
     last_name = Column(String)
     college = Column(String, nullable=False)
     email = Column(String, unique=True)
+    password = Column(String(60), nullable=False)
 
     def __init__(self, user_name, roll_no, first_name, college, email):
+        
+        salt = bcrypt.gensalt()
+        hashed_pw = bcrypt.hashpw(password, salt)
+        
         self.user_name = user_name
         self.roll_no = roll_no
         self.first_name = first_name
         self.last_name = last_name
         self.college = college
         self.email = email
+        self.password = hashed_pw
 
     def valid_email(email):
         if not re.match("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$", email):
