@@ -1,144 +1,65 @@
-from flask import Flask, render_template, flash, request, url_for, redirect, session
-from wtforms import Form, BooleanField, TextField, PasswordField, validators
-from passlib.hash import sha256_crypt
-from MySQLdb import escape_string as thwart
-import gc
-import MySQLdb
-from functools import wraps
+from flask import Flask, flash, redirect, render_template, request, session, abort
+from sqlalchemy.orm import sessionmaker
+from Project import Register, Base
+from sqlalchemy import create_engine
+import os
+import bcrypt
 
-"""  	UTILITY FUNCTIONS	"""
-
-def connection():
-    conn = MySQLdb.connect(host="localhost",
-                           user = "root",
-                           passwd = "localhost8000",
-                           db = "testing")
-    c = conn.cursor()
-
-    return c, conn
-
-
-# DECORATOR
-def login_required(f):
-    @wraps(f)
-    def wrap(*args, **kwargs):
-        if 'logged_in' in session:
-            return f(*args, **kwargs)
-        else:
-            flash("You need to login first")
-            return redirect(url_for('login_page'))
-
-    return wrap
-
-
-
-class RegistrationForm(Form):
-    username = TextField('Username', [validators.Length(min=4, max=20)])
-    email = TextField('Email Address', [validators.Length(min=6, max=50)])
-    password = PasswordField('New Password', [
-        validators.Required(),
-        validators.EqualTo('confirm', message='Passwords must match')
-    ])
-    confirm = PasswordField('Repeat Password')
-    accept_tos = BooleanField('I accept the Terms of Service and Privacy Notice (updated Jan 22, 2015)', [validators.Required()])
-    
-
+engine = create_engine('sqlite:///C:\\Users\\Saurav Verma\\Downloads\\Compressed\\flaskSamples\\6-FlaskLogin\\tuoj.db')
 app = Flask(__name__)
 
-
 @app.route('/')
-def homepage():
-    return render_template("main.html")
+def home():
+    if not session.get('logged_in'):
+        return render_template('index.html')
+    else:
+        return "Hello " + session['user'] + "!  <a href='/logout'>Logout</a>"
 
+@app.route('/login', methods=['POST'])
+def do_admin_login():
 
-@app.route('/dashboard/')
-def dashboard():
-    return render_template("dashboard.html")
+    POST_USERNAME = request.form['username']
+    POST_PASSWORD = request.form['password']
 
+    Session = sessionmaker(bind=engine)
+    s = Session()
+    query = s.query(Register).filter(Register.user_name.in_([POST_USERNAME])).first()
 
-@app.errorhandler(404)
-def page_not_found(e):
-    return render_template("404.html")
+    if( query ):
+        if bcrypt.hashpw(POST_PASSWORD.encode('utf-8'), query.password) == query.password:
+            session['logged_in'] = True
+            session['user'] = POST_USERNAME
+        else:
+            flash('Wrong Password')
 
+    return home()
 
-@app.route('/register/', methods=["GET","POST"])
-def register_page():
-    try:
-        form = RegistrationForm(request.form)
+@app.route('/register', methods=['POST'])
+def register():
 
-        if request.method == "POST" and form.validate():
-            username  = form.username.data
-            email = form.email.data
-            password = sha256_crypt.encrypt((str(form.password.data)))
-            c, conn = connection()
+    POST_USERNAME = request.form['username']
+    POST_ROLLNO   = request.form['rollno']
+    POST_FNAME    = request.form['fname']
+    POST_LNAME    = request.form['lname']
+    POST_COLLEGE  = request.form['college']
+    POST_EMAIL    = request.form['email']
+    POST_PASSWORD = request.form['password']
 
-          
-            x = c.execute("SELECT * FROM users WHERE username = %s", (username,))
-            if int(x) > 0:
-                flash("That username is already taken, please choose another")
-                return render_template('register.html', form=form)
+    Session = sessionmaker(bind=engine)
+    s = Session()
 
-            else:
-                c.execute("INSERT INTO users (username, password, email, tracking) VALUES (%s, %s, %s, %s)",
-                          (thwart(username), thwart(password), thwart(email), thwart("/introduction-to-python-programming/")))
-                
-                conn.commit()
-                flash("Thanks for registering!")
-                c.close()
-                conn.close()
-                gc.collect()
+    register = Register(POST_USERNAME, POST_ROLLNO, POST_FNAME, POST_LNAME, POST_COLLEGE, POST_EMAIL, POST_PASSWORD.encode('utf-8'))
+    s.add(register)
 
-                session['logged_in'] = True
-                session['username'] = username
+    s.commit()
 
-                return redirect(url_for('dashboard'))
+    return home()
 
-        return render_template("register.html", form=form)
-
-    except Exception as e:
-        return(str(e))
-
-
-@app.route('/login/', methods=["GET","POST"])
-def login_page():
-    error = ''
-    try:
-        c, conn = connection()
-        if request.method == "POST":
-
-            data = c.execute("SELECT * FROM users WHERE username = (%s)", (request.form['username'],))
-            
-            data = c.fetchone()[2]
-
-            if sha256_crypt.verify(request.form['password'], data):
-                session['logged_in'] = True
-                session['username'] = request.form['username']
-
-                flash("You are now logged in")
-                return redirect(url_for("dashboard"))
-
-            else:
-                error = "Invalid credentials, try again."
-
-        gc.collect()
-
-        return render_template("login.html", error=error)
-
-    except Exception as e:
-        #flash(e)
-        error = "Invalid credentials, try again."
-        return render_template("login.html", error = error)  
-
-
-@app.route("/logout/")
-@login_required
+@app.route("/logout")
 def logout():
-    session.clear()
-    flash("You have been logged out!")
-    gc.collect()
-    return redirect(url_for('dashboard'))
-
-
+    session['logged_in'] = False
+    return home()
+ 
 if __name__ == "__main__":
-	app.secret_key = 'some secret key'
-	app.run()
+    app.secret_key = os.urandom(12)
+    app.run(debug=True)
