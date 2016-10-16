@@ -1,0 +1,232 @@
+<link rel="stylesheet" href="/static/style.css" type="text/css" xmlns="http://www.w3.org/1999/html">
+{% block body %}
+{% if session['logged_in'] %}
+<p>You're logged in already!</p>
+{% else %}
+
+<title>My Application</title>
+ {% with messages = get_flashed_messages() %}
+   {% if messages %}
+     <ul class="flashes">
+        {% for message in messages %}
+            <div class="message_flash">{{ message }}</div>
+        {% endfor %}
+     </ul>
+   {% endif %}
+ {% endwith %}
+ 
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="">
+
+        <title style="font-family: 'Kaushan Script', cursive;">TUOJ</title>
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+		<link href="https://fonts.googleapis.com/css?family=Indie+Flower" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css?family=Shadows+Into+Light" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css?family=Kaushan+Script" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css?family=Cuprum" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css?family=Acme" rel="stylesheet">
+
+		<script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function(){
+                $("#myModal").modal('show');
+            });
+        </script>
+
+        <style>
+        body {
+            font-family: 'Cuprum', sans-serif;
+        }
+
+        </style>
+    </head>
+
+    <body>
+        <div class="row">
+            <div class="container col-xs-12 col-md-12 col-sm-12 col-lg-12" >
+                <span style="font-size:50px; font-family: 'Kaushan Script', cursive;">T</span><span style="font-size: 20px; font-family: 'Kaushan Script', cursive;">hapar </span>
+                <span style="font-size:50px; font-family: 'Kaushan Script', cursive;">U</span><span style="font-size: 20px; font-family: 'Kaushan Script', cursive;">niversity </span>
+                <span style="font-size:50px; font-family: 'Kaushan Script', cursive;">O</span><span style="font-size: 20px; font-family: 'Kaushan Script', cursive;">nline </span>
+                <span style="font-size:50px; font-family: 'Kaushan Script', cursive;">J</span><span style="font-size: 20px; font-family: 'Kaushan Script', cursive;">udge</span>
+            </div>
+        </div>
+        <div class="container-fluid">
+            <nav class="navbar navbar-default" role="navigation">
+                <div class="container-fluid" style="color: black">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="/" style="font-family: 'Kaushan Script', cursive;">TUOJ</a>
+                    </div>
+
+                    <div class="collapse navbar-collapse navbar-ex1-collapse" id="topnav">
+                        <ul class="nav navbar-nav navbar-right">
+                            <li><a href="#"><strong>Practice</strong></a></li>
+                            <li><a href="#"><strong>Compete</strong></a></li>
+                            <li><a href="#"><strong>Discuss</strong></a></li>
+                            <li><a href="#"><strong>About</strong></a></li>
+                            <li><a href="#" title="Login to your account" data-toggle="modal" data-target="#login-modal"><strong>Login</strong></a></li>
+                            <li><a href='#' title="Registering yourself" data-toggle="modal" data-target="#signup-modal"><strong>Sign Up</strong></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>
+
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+
+<!--Login Modal Start-->
+    <div class="modal fade in" id="login-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none; top: 18%;">
+    <div class="modal-dialog modal-lg">
+        <div class="loginmodal-container">
+            <div class="row vertical-offset-200">
+            <div class="col-md-2 col-md-offset-6 col-lg-6 col-lg-offset-3 col-sm-12 col-md-offset-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <span style="font-size: 24pt; font-family: 'Acme', sans-serif;">Hello! SignIn to get started.</span>
+                    </div>
+                    <div class="panel-body">
+					    <form action="{{url_for('do_admin_login')}}" method="POST">
+							<div class="login">
+								<div class="login-screen">
+									<div class="app-title">
+										<!--<span style="font-family: 'Acme', sans-serif;">LogIn</span></br></br>-->
+									</div>
+
+									<div class="login-form">
+										<div class="control-group lg">
+										    <span style="font-family: 'Acme', sans-serif; font-size: 16pt">Username</span></br>
+											<input class="form-control" type="text" class="login-field" value="" placeholder="Username" name="username" style="font-family: 'Acme', sans-serif;"></br>
+											<span style="font-family: 'Acme', sans-serif; font-size: 16pt">Password</span></br>
+											<label class="login-field-icon fui-user" for="login-name"></label>
+										</div>
+
+										<div class="control-group">
+											<input class="form-control" type="password" class="login-field" value="" placeholder="Password" name="password" style="font-family: 'Acme', sans-serif;">
+											<label class="login-field-icon fui-lock" for="login-pass"></label>
+										</div>
+
+                                        </br>
+                                        <span style="font-family: 'Acme', sans-serif; margin-left: 58%; font-size: 12pt">New User? <a href="#" data-toggle="modal" data-target="#signup-modal" data-dismiss="modal">Register here</a></span>
+						                <input type="submit" value="Log in" class="btn btn-primary btn-large btn-block" >
+									    <br>
+									</div>
+								</div>
+							</div>
+						</form>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <script type="text/javascript">
+            $(document).ready(function(){
+                $("#myModal").modal('show');
+            });
+    </script>
+<!--Login Modal End-->
+
+<!--Sign-up Modal Start-->
+    <div class="modal fade in" id="signup-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none; top: 10%">
+    <div class="modal-dialog modal-lg">
+        <div class="loginmodal-container">
+            <div class="row vertical-offset-1200">
+            <div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2 col-sm-12 col-md-offset-0">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <span style="font-size: 20pt; font-family: 'Acme', sans-serif;">Register yourself here!</span>
+                    </div>
+                    <div class="panel-body">
+					    <form action="{{url_for('register')}}" method="POST">
+					        <fieldset>
+                                <div class="login">
+                                    <div class="login-screen">
+                                        <div class="app-title">
+                                            <!--<span style="font-size: 18pt; font-family: 'Acme', sans-serif;">Login</span></br></br>-->
+                                        </div>
+
+                                        <div class="login-form">
+                                            <div class="control-group lg">
+                                            <div class="col-lg-6">
+                                                <span style="font-size: 12pt; font-family: 'Acme', sans-serif;">Username</span></br>
+                                                <input class="form-control" type="text" class="login-field" value="" placeholder="Username" name="username" style="font-family: 'Acme', sans-serif;"></label></br>
+                                                <span style="font-size: 12pt; font-family: 'Acme', sans-serif;">Roll No.</span></br>
+                                                <input class="form-control" type="text" class="login-field" value="" placeholder="Roll No" name="rollno" style="font-family: 'Acme', sans-serif;"></label></br>
+                                                <span style="font-size: 12pt; font-family: 'Acme', sans-serif;">First Name</span></br>
+                                                <input class="form-control" type="text" class="login-field" value="" placeholder="First Name" name="fname" style="font-family: 'Acme', sans-serif;"></label></br>
+                                                <span style="font-size: 12pt; font-family: 'Acme', sans-serif;">Last Name</span></br>
+                                                <input class="form-control" type="text" class="login-field" value="" placeholder="Last Name" name="lname" style="font-family: 'Acme', sans-serif;"></label></br>
+
+                                            </div>
+                                            <div class="col-lg-6" style="border-left:1px solid #ccc;height:300px">
+                                                <span style="font-size: 12pt; font-family: 'Acme', sans-serif;">College</span></br>
+                                                <input class="form-control" type="text" class="login-field" value="" placeholder="College" name="college" style="font-family: 'Acme', sans-serif;"></label></br>
+                                                <span style="font-size: 12pt; font-family: 'Acme', sans-serif;">Email Id</span></br>
+                                                <input class="form-control" type="text" class="login-field" value="" placeholder="Email Id" name="email" style="font-family: 'Acme', sans-serif;"></label></br>
+                                                <span style="font-size: 12pt; font-family: 'Acme', sans-serif;">Password</span></br>
+                                                <label class="login-field-icon fui-user" for="login-name"></label>
+
+                                                <div class="control-group">
+                                                    <input class="form-control" type="password" class="login-field" value="" placeholder="Password" name="password" style="font-family: 'Acme', sans-serif;">
+                                                    <label class="login-field-icon fui-lock" for="login-pass"></label>
+                                                </div></br>
+
+                                                <span style="font-size: 12pt; font-family: 'Acme', sans-serif;">Confirm Password</span></br>
+                                                <label class="login-field-icon fui-user" for="login-name"></label>
+
+                                                <div class="control-group">
+                                                    <input class="form-control" type="password" class="login-field" value="" placeholder="Confirm Password" name="cpassword" style="font-family: 'Acme', sans-serif;">
+                                                    <label class="login-field-icon fui-lock" for="login-pass"></label>
+                                                </div></br>
+                                            </div>
+                                            </div>
+
+
+
+                                            <input type="submit" value="Register" class="btn btn-primary btn-medium btn-block" ></br>
+                                            <strong><span style="font-size: 12pt">Existing User? <a href="#" data-toggle="modal" data-target="#login-modal" data-dismiss="modal">Log In here!</a></span></br></strong>
+                                            <br>
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+						</form>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <script type="text/javascript">
+            $(document).ready(function(){
+                $("#myModal").modal('show');
+            });
+    </script>
+<!--Sign-up Modal End-->
+
+	</body>
+</html>
+ 
+{% endif %}
+{% endblock %}
