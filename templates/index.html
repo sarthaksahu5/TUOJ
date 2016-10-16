@@ -1,10 +1,5 @@
 <link rel="stylesheet" href="/static/style.css" type="text/css" xmlns="http://www.w3.org/1999/html">
-{% block body %}
-{% if session['logged_in'] %}
-<p>You're logged in already!</p>
-{% else %}
-
-<title>My Application</title>
+<title>TUOJ</title>
  {% with messages = get_flashed_messages() %}
    {% if messages %}
      <ul class="flashes">
@@ -34,6 +29,7 @@
 		<link href="https://fonts.googleapis.com/css?family=Kaushan+Script" rel="stylesheet">
 		<link href="https://fonts.googleapis.com/css?family=Cuprum" rel="stylesheet">
 		<link href="https://fonts.googleapis.com/css?family=Acme" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css?family=Sanchez" rel="stylesheet">
 
 		<script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
         <script src="js/bootstrap.min.js"></script>
@@ -53,11 +49,14 @@
 
     <body>
         <div class="row">
-            <div class="container col-xs-12 col-md-12 col-sm-12 col-lg-12" >
+            <div class="container col-xs-9 col-md-9 col-sm-9 col-lg-9" >
                 <span style="font-size:50px; font-family: 'Kaushan Script', cursive;">T</span><span style="font-size: 20px; font-family: 'Kaushan Script', cursive;">hapar </span>
                 <span style="font-size:50px; font-family: 'Kaushan Script', cursive;">U</span><span style="font-size: 20px; font-family: 'Kaushan Script', cursive;">niversity </span>
                 <span style="font-size:50px; font-family: 'Kaushan Script', cursive;">O</span><span style="font-size: 20px; font-family: 'Kaushan Script', cursive;">nline </span>
                 <span style="font-size:50px; font-family: 'Kaushan Script', cursive;">J</span><span style="font-size: 20px; font-family: 'Kaushan Script', cursive;">udge</span>
+            </div>
+            <div class="container col-xs-3 col-md-3 col-sm-3 col-lg-3" style="margin-top: 2.8%; text-align: justify">
+                <span style="font-size: 18px; font-family: 'Sanchez', serif;">THAPAR'S OWN ONLINE JUDGE</span>
             </div>
         </div>
         <div class="container-fluid">
@@ -75,12 +74,21 @@
 
                     <div class="collapse navbar-collapse navbar-ex1-collapse" id="topnav">
                         <ul class="nav navbar-nav navbar-right">
-                            <li><a href="#"><strong>Practice</strong></a></li>
-                            <li><a href="#"><strong>Compete</strong></a></li>
-                            <li><a href="#"><strong>Discuss</strong></a></li>
-                            <li><a href="#"><strong>About</strong></a></li>
-                            <li><a href="#" title="Login to your account" data-toggle="modal" data-target="#login-modal"><strong>Login</strong></a></li>
-                            <li><a href='#' title="Registering yourself" data-toggle="modal" data-target="#signup-modal"><strong>Sign Up</strong></a></li>
+                            {% if value == False %}
+                                <li><a href="#"><strong>Practice</strong></a></li>
+                                <li><a href="#"><strong>Compete</strong></a></li>
+                                <li><a href="#"><strong>Discuss</strong></a></li>
+                                <li><a href="#"><strong>About</strong></a></li>
+                                <li><a href="#" title="Login to your account" data-toggle="modal" data-target="#login-modal"><strong>Login</strong></a></li>
+                                <li><a href='#' title="Registering yourself" data-toggle="modal" data-target="#signup-modal"><strong>Sign Up</strong></a></li>
+                            {% else %}
+                                <li><a href="#"><strong>Hello, {{ user }}</strong></a></li>
+                                <li><a href="#"><strong>Practice</strong></a></li>
+                                <li><a href="#"><strong>Compete</strong></a></li>
+                                <li><a href="#"><strong>Discuss</strong></a></li>
+                                <li><a href="#"><strong>About</strong></a></li>
+                                <li><a href="{{ url_for('logout') }}"><strong>Logout</strong></a></li>
+                            {% endif %}
                         </ul>
                     </div>
                 </div>
@@ -96,7 +104,7 @@
     <div class="modal-dialog modal-lg">
         <div class="loginmodal-container">
             <div class="row vertical-offset-200">
-            <div class="col-md-2 col-md-offset-6 col-lg-6 col-lg-offset-3 col-sm-12 col-md-offset-12">
+            <div class="col-md-6 col-md-offset-3 col-lg-6 col-lg-offset-3 col-sm-10 col-sm-offset-1">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <span style="font-size: 24pt; font-family: 'Acme', sans-serif;">Hello! SignIn to get started.</span>
@@ -169,19 +177,10 @@
                                             <div class="col-lg-6">
                                                 <span style="font-size: 12pt; font-family: 'Acme', sans-serif;">Username</span></br>
                                                 <input class="form-control" type="text" class="login-field" value="" placeholder="Username" name="username" style="font-family: 'Acme', sans-serif;"></label></br>
-                                                <span style="font-size: 12pt; font-family: 'Acme', sans-serif;">Roll No.</span></br>
-                                                <input class="form-control" type="text" class="login-field" value="" placeholder="Roll No" name="rollno" style="font-family: 'Acme', sans-serif;"></label></br>
                                                 <span style="font-size: 12pt; font-family: 'Acme', sans-serif;">First Name</span></br>
                                                 <input class="form-control" type="text" class="login-field" value="" placeholder="First Name" name="fname" style="font-family: 'Acme', sans-serif;"></label></br>
                                                 <span style="font-size: 12pt; font-family: 'Acme', sans-serif;">Last Name</span></br>
                                                 <input class="form-control" type="text" class="login-field" value="" placeholder="Last Name" name="lname" style="font-family: 'Acme', sans-serif;"></label></br>
-
-                                            </div>
-                                            <div class="col-lg-6" style="border-left:1px solid #ccc;height:300px">
-                                                <span style="font-size: 12pt; font-family: 'Acme', sans-serif;">College</span></br>
-                                                <input class="form-control" type="text" class="login-field" value="" placeholder="College" name="college" style="font-family: 'Acme', sans-serif;"></label></br>
-                                                <span style="font-size: 12pt; font-family: 'Acme', sans-serif;">Email Id</span></br>
-                                                <input class="form-control" type="text" class="login-field" value="" placeholder="Email Id" name="email" style="font-family: 'Acme', sans-serif;"></label></br>
                                                 <span style="font-size: 12pt; font-family: 'Acme', sans-serif;">Password</span></br>
                                                 <label class="login-field-icon fui-user" for="login-name"></label>
 
@@ -190,6 +189,14 @@
                                                     <label class="login-field-icon fui-lock" for="login-pass"></label>
                                                 </div></br>
 
+                                            </div>
+                                            <div class="col-lg-6" style="border-left:1px solid #ccc;height:300px">
+                                                <span style="font-size: 12pt; font-family: 'Acme', sans-serif;">College</span></br>
+                                                <input class="form-control" type="text" class="login-field" value="" placeholder="College" name="college" style="font-family: 'Acme', sans-serif;"></label></br>
+                                                <span style="font-size: 12pt; font-family: 'Acme', sans-serif;">Email Id</span></br>
+                                                <input class="form-control" type="text" class="login-field" value="" placeholder="Email Id" name="email" style="font-family: 'Acme', sans-serif;"></label></br>
+                                                <span style="font-size: 12pt; font-family: 'Acme', sans-serif;">Roll No.</span></br>
+                                                <input class="form-control" type="text" class="login-field" value="" placeholder="Roll No" name="rollno" style="font-family: 'Acme', sans-serif;"></label></br>
                                                 <span style="font-size: 12pt; font-family: 'Acme', sans-serif;">Confirm Password</span></br>
                                                 <label class="login-field-icon fui-user" for="login-name"></label>
 
@@ -197,6 +204,7 @@
                                                     <input class="form-control" type="password" class="login-field" value="" placeholder="Confirm Password" name="cpassword" style="font-family: 'Acme', sans-serif;">
                                                     <label class="login-field-icon fui-lock" for="login-pass"></label>
                                                 </div></br>
+
                                             </div>
                                             </div>
 
@@ -227,6 +235,3 @@
 
 	</body>
 </html>
- 
-{% endif %}
-{% endblock %}
