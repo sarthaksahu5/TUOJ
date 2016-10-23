@@ -1,24 +1,54 @@
-from flask import Flask, flash, redirect, render_template, request, session, abort
+from flask import Flask, flash, redirect, render_template, request, session, url_for, send_from_directory
 from sqlalchemy.orm import sessionmaker
 from Project import Register, Base
 from sqlalchemy import create_engine
 import os
 import bcrypt
+from werkzeug import secure_filename
 
 engine = create_engine('sqlite:///C:\\Users\\Saurav Verma\\Downloads\\Compressed\\flaskSamples\\6-FlaskLogin\\tuoj.db')
 app = Flask(__name__)
 
+APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+UPLOAD_FOLDER = os.path.join(APP_ROOT, 'css/')
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['ALLOWED_EXTENSIONS'] = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'py', 'db'])
+app.config['MAX_CONTENT_LENGTH'] = 1 * 1024 * 1024
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('error.html'), 404
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS']
+
+@app.route('/problems')
+def problems():
+    return render_template('Problem.html', value = False)
+
+@app.route('/upload')
+def index():
+    if not session.get('logged_in'):
+        return render_template('error.html')
+    else:
+        user = session['user']
+        if user == 'admin' :
+            return render_template('upload.html')
+        else:
+            return render_template('error.html')
+
 @app.route('/')
 def home():
     if not session.get('logged_in'):
-        return render_template('index.html')
+        return render_template('index.html', value = False)
     else:
-        return "Hello " + session['user'] + "!  <a href='/logout'>Logout</a>"
+        return render_template('index.html', value = True, user = session['user'] )
 
 @app.route('/login', methods=['POST'])
 def do_admin_login():
 
-    POST_USERNAME = request.form['username']
+    POST_USERNAME = str(request.form['username'])
     POST_PASSWORD = request.form['password']
 
     Session = sessionmaker(bind=engine)
@@ -54,6 +84,21 @@ def register():
     s.commit()
 
     return home()
+
+@app.route('/upload', methods=['POST'])
+def upload():
+    file = request.files['file']
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        return redirect(url_for('uploaded_file', filename=filename))
+    else:
+        flash('file format not supported')
+        return url_for('index.html')
+
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 @app.route("/logout")
 def logout():
