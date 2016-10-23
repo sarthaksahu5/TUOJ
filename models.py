@@ -18,11 +18,11 @@ class Register(Base):
     email = Column(String, unique=True)
     password = Column(String(60), nullable=False)
 
-    def __init__(self, user_name, roll_no, first_name, college, email):
-        
+    def __init__(self, user_name, roll_no, first_name, last_name, college, email, password):
+
         salt = bcrypt.gensalt()
         hashed_pw = bcrypt.hashpw(password, salt)
-        
+
         self.user_name = user_name
         self.roll_no = roll_no
         self.first_name = first_name
