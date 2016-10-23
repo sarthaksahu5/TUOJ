@@ -1,23 +1,26 @@
-<link rel="stylesheet" href="/static/style.css" type="text/css" xmlns="http://www.w3.org/1999/html">
+<link rel="stylesheet" href="/static/style.css" type="text/css" xmlns="http://www.w3.org/1999/html"
+      xmlns="http://www.w3.org/1999/html">
 <title>TUOJ</title>
  {% with messages = get_flashed_messages() %}
    {% if messages %}
-     <ul class="flashes">
         {% for message in messages %}
-            <div class="message_flash">{{ message }}</div>
+            <script type="text/javascript">
+                $(document).ready(function(){
+                    $("#login-modal").modal('show');
+                });
+            </script>
         {% endfor %}
-     </ul>
    {% endif %}
  {% endwith %}
  
-<!DOCTYPE html>
+<!DOCTYPE HTML>
 <html lang="en">
 
     <head>
 
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
         <meta name="description" content="">
         <meta name="author" content="">
 
@@ -75,16 +78,29 @@
                     <div class="collapse navbar-collapse navbar-ex1-collapse" id="topnav">
                         <ul class="nav navbar-nav navbar-right">
                             {% if value == False %}
-                                <li><a href="#"><strong>Practice</strong></a></li>
+                                <li><a href="{{ url_for('problems') }}"><strong>Practice</strong></a></li>
                                 <li><a href="#"><strong>Compete</strong></a></li>
                                 <li><a href="#"><strong>Discuss</strong></a></li>
                                 <li><a href="#"><strong>About</strong></a></li>
                                 <li><a href="#" title="Login to your account" data-toggle="modal" data-target="#login-modal"><strong>Login</strong></a></li>
                                 <li><a href='#' title="Registering yourself" data-toggle="modal" data-target="#signup-modal"><strong>Sign Up</strong></a></li>
                             {% else %}
-                                <li><a href="#"><strong>Hello, {{ user }}</strong></a></li>
-                                <li><a href="#"><strong>Practice</strong></a></li>
-                                <li><a href="#"><strong>Compete</strong></a></li>
+                                <!--<li><a href="#"><strong>Hello, {{ user }}</strong></a></li>-->
+                                <li><button class="btn btn-default center-block dropdown-toggle" type="button" id="menu1" data-toggle="dropdown" style="font-family: 'Cuprum', sans-serif; background-color: transparent; outline: none; border: none; margin-top: 8.5px"><strong>Hello, {{ user }}
+                                </strong><span class="caret"></span></button>
+                                    <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#"><strong>Profile</strong></a></li>
+                                        {% if user == 'admin' %}
+                                            <li role="presentation"><a role="menuitem" tabindex="-1" href="{{ url_for('index') }}"><strong>Upload Problem</strong></a></li>
+                                        {% endif %}
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#"><strong>Manage profile</strong></a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#"><strong>Submission history</strong></a></li>
+                                        <!--<li role="presentation" class="divider"></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">About Us</a></li>-->
+                                    </ul></li>
+                                <li><a href="#"><strong>Problems</strong></a></li>
+                                <!--<li><a href="#"><strong>Practice</strong></a></li>
+                                <li><a href="#"><strong>Compete</strong></a></li>-->
                                 <li><a href="#"><strong>Discuss</strong></a></li>
                                 <li><a href="#"><strong>About</strong></a></li>
                                 <li><a href="{{ url_for('logout') }}"><strong>Logout</strong></a></li>
@@ -107,7 +123,7 @@
             <div class="col-md-6 col-md-offset-3 col-lg-6 col-lg-offset-3 col-sm-10 col-sm-offset-1">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <span style="font-size: 24pt; font-family: 'Acme', sans-serif;">Hello! SignIn to get started.</span>
+                        <span style="font-size: 20pt; font-family: 'Acme', sans-serif;"><button class="close" data-dismiss="modal"><a href="url_for{{ ('home') }}">&times;</a></button>Hello! SignIn to get started</span>
                     </div>
                     <div class="panel-body">
 					    <form action="{{url_for('do_admin_login')}}" method="POST">
@@ -117,24 +133,33 @@
 										<!--<span style="font-family: 'Acme', sans-serif;">LogIn</span></br></br>-->
 									</div>
 
-									<div class="login-form">
-										<div class="control-group lg">
-										    <span style="font-family: 'Acme', sans-serif; font-size: 16pt">Username</span></br>
-											<input class="form-control" type="text" class="login-field" value="" placeholder="Username" name="username" style="font-family: 'Acme', sans-serif;"></br>
-											<span style="font-family: 'Acme', sans-serif; font-size: 16pt">Password</span></br>
-											<label class="login-field-icon fui-user" for="login-name"></label>
-										</div>
+									{% with messages = get_flashed_messages() %}
+                                    {% if messages %}
+									    <div>
+									        <span style="text-align: center">Wrong ID or Password!</span>
+                                        </div>
 
-										<div class="control-group">
-											<input class="form-control" type="password" class="login-field" value="" placeholder="Password" name="password" style="font-family: 'Acme', sans-serif;">
-											<label class="login-field-icon fui-lock" for="login-pass"></label>
-										</div>
+                                    {% else %}
+                                        <div class="login-form">
+                                            <div class="control-group lg">
+                                                <span style="font-family: 'Acme', sans-serif; font-size: 12pt">Username</span></br>
+                                                <input class="form-control" type="text" class="login-field" value="" placeholder="Username" name="username" style="font-family: 'Acme', sans-serif;"></br>
+                                                <span style="font-family: 'Acme', sans-serif; font-size: 12pt">Password</span></br>
+                                                <label class="login-field-icon fui-user" for="login-name"></label>
+                                            </div>
 
-                                        </br>
-                                        <span style="font-family: 'Acme', sans-serif; margin-left: 58%; font-size: 12pt">New User? <a href="#" data-toggle="modal" data-target="#signup-modal" data-dismiss="modal">Register here</a></span>
-						                <input type="submit" value="Log in" class="btn btn-primary btn-large btn-block" >
-									    <br>
-									</div>
+                                            <div class="control-group">
+                                                <input class="form-control" type="password" class="login-field" value="" placeholder="Password" name="password" style="font-family: 'Acme', sans-serif;">
+                                                <label class="login-field-icon fui-lock" for="login-pass"></label>
+                                            </div>
+
+                                            </br>
+                                            <span style="font-family: 'Acme', sans-serif; margin-left: 58%; font-size: 12pt">New User? <a href="#" data-toggle="modal" data-target="#signup-modal" data-dismiss="modal">Register here</a></span>
+                                            <input type="submit" value="Log in" class="btn btn-primary btn-large btn-block" >
+                                            <br>
+                                        </div>
+                                    {% endif %}
+                                    {% endwith %}
 								</div>
 							</div>
 						</form>
@@ -146,11 +171,17 @@
     </div>
     </div>
 
-    <script type="text/javascript">
-            $(document).ready(function(){
-                $("#myModal").modal('show');
-            });
-    </script>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+           {% for message in messages %}
+               <script type="text/javascript">
+                   $(document).ready(function(){
+                       $("#login-modal").modal('show');
+                   });
+               </script>
+           {% endfor %}
+      {% endif %}
+    {% endwith %}
 <!--Login Modal End-->
 
 <!--Sign-up Modal Start-->
@@ -161,7 +192,7 @@
             <div class="col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2 col-sm-12 col-md-offset-0">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <span style="font-size: 20pt; font-family: 'Acme', sans-serif;">Register yourself here!</span>
+                        <span style="font-size: 20pt; font-family: 'Acme', sans-serif;"><button class="close" data-dismiss="modal">&times;</button>Register yourself here!</span>
                     </div>
                     <div class="panel-body">
 					    <form action="{{url_for('register')}}" method="POST">
