@@ -1,4 +1,4 @@
-from sqlalchemy import ForeignKey, Column, String, INTEGER, DateTime, Float
+from sqlalchemy import ForeignKey, Column, String, INTEGER, DateTime, Float, TEXT
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
@@ -62,13 +62,21 @@ class Problem(Base):
     __tablename__ = 'problem'
 
     problem_id = Column(String, primary_key=True)
+    problem_name = Column(String, unique=True)
     difficulty = Column(String, nullable=False)
+    content = Column(TEXT, nullable=False)
+    total_submissions = Column(INTEGER, default=0)
+    correct_submissions = Column(INTEGER, default=0)
     tags = Column(String, nullable=False)
 
-    def __init__(self):
+    def __init__(self, problem_id, problem_name, difficulty, content, tags):
         self.problem_id = problem_id
+        self.problem_name = problem_name
         self.difficulty = difficulty
+        self.content = content
         self.tags = tags
+        self.total_submissions = 0
+        self.correct_submissions = 0
 
 class Submission(Base):
     __tablename__ = 'submission'
