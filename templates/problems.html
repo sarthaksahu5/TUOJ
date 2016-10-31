@@ -1,0 +1,9 @@
+{% extends 'index.html' %}
+
+{% block content %}
+    <span>{{ problem['content'] }}</span></br>
+    <form action="{{ url_for('problem', name = problem['problem_name']) }}" method="POST" enctype="multipart/form-data">
+        <input type="file" name="file"><br /><br />
+        <input type="submit" value="Upload Soltution">
+    </form>
+{% endblock %}

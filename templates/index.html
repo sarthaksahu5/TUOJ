@@ -1,17 +1,6 @@
 <link rel="stylesheet" href="/static/style.css" type="text/css" xmlns="http://www.w3.org/1999/html"
       xmlns="http://www.w3.org/1999/html">
 <title>TUOJ</title>
- {% with messages = get_flashed_messages() %}
-   {% if messages %}
-        {% for message in messages %}
-            <script type="text/javascript">
-                $(document).ready(function(){
-                    $("#login-modal").modal('show');
-                });
-            </script>
-        {% endfor %}
-   {% endif %}
- {% endwith %}
  
 <!DOCTYPE HTML>
 <html lang="en">
@@ -52,13 +41,13 @@
 
     <body>
         <div class="row">
-            <div class="container col-xs-9 col-md-9 col-sm-9 col-lg-9" >
+            <div class="container col-xs-6 col-md-6 col-sm-6 col-lg-6" >
                 <span style="font-size:50px; font-family: 'Kaushan Script', cursive;">T</span><span style="font-size: 20px; font-family: 'Kaushan Script', cursive;">hapar </span>
                 <span style="font-size:50px; font-family: 'Kaushan Script', cursive;">U</span><span style="font-size: 20px; font-family: 'Kaushan Script', cursive;">niversity </span>
                 <span style="font-size:50px; font-family: 'Kaushan Script', cursive;">O</span><span style="font-size: 20px; font-family: 'Kaushan Script', cursive;">nline </span>
                 <span style="font-size:50px; font-family: 'Kaushan Script', cursive;">J</span><span style="font-size: 20px; font-family: 'Kaushan Script', cursive;">udge</span>
             </div>
-            <div class="container col-xs-3 col-md-3 col-sm-3 col-lg-3" style="margin-top: 2.8%; text-align: justify">
+            <div class="container col-xs-3 col-md-3 col-sm-3 col-lg-3 col-xs-offset-3 col-md-offset-3 col-sm-offset-3 col-lg-offset-3" style="margin-top: 2.8%; text-align: justify">
                 <span style="font-size: 18px; font-family: 'Sanchez', serif;">THAPAR'S OWN ONLINE JUDGE</span>
             </div>
         </div>
@@ -89,16 +78,16 @@
                                 <li><button class="btn btn-default center-block dropdown-toggle" type="button" id="menu1" data-toggle="dropdown" style="font-family: 'Cuprum', sans-serif; background-color: transparent; outline: none; border: none; margin-top: 8.5px"><strong>Hello, {{ user }}
                                 </strong><span class="caret"></span></button>
                                     <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
-                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#"><strong>Profile</strong></a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="{{ url_for('profile', username = user) }}"><strong>Profile</strong></a></li>
                                         {% if user == 'admin' %}
-                                            <li role="presentation"><a role="menuitem" tabindex="-1" href="{{ url_for('index') }}"><strong>Upload Problem</strong></a></li>
+                                            <li role="presentation"><a role="menuitem" tabindex="-1" href="{{ url_for('upload') }}"><strong>Upload Problem</strong></a></li>
                                         {% endif %}
                                         <li role="presentation"><a role="menuitem" tabindex="-1" href="#"><strong>Manage profile</strong></a></li>
                                         <li role="presentation"><a role="menuitem" tabindex="-1" href="#"><strong>Submission history</strong></a></li>
                                         <!--<li role="presentation" class="divider"></li>
                                         <li role="presentation"><a role="menuitem" tabindex="-1" href="#">About Us</a></li>-->
                                     </ul></li>
-                                <li><a href="#"><strong>Problems</strong></a></li>
+                                <li><a href="{{ url_for('problems') }}"><strong>Problems</strong></a></li>
                                 <!--<li><a href="#"><strong>Practice</strong></a></li>
                                 <li><a href="#"><strong>Compete</strong></a></li>-->
                                 <li><a href="#"><strong>Discuss</strong></a></li>
@@ -109,6 +98,8 @@
                     </div>
                 </div>
             </nav>
+            {% block content %}
+            {% endblock %}
         </div>
 
     <script src="js/jquery.js"></script>
@@ -132,14 +123,6 @@
 									<div class="app-title">
 										<!--<span style="font-family: 'Acme', sans-serif;">LogIn</span></br></br>-->
 									</div>
-
-									{% with messages = get_flashed_messages() %}
-                                    {% if messages %}
-									    <div>
-									        <span style="text-align: center">Wrong ID or Password!</span>
-                                        </div>
-
-                                    {% else %}
                                         <div class="login-form">
                                             <div class="control-group lg">
                                                 <span style="font-family: 'Acme', sans-serif; font-size: 12pt">Username</span></br>
@@ -158,8 +141,6 @@
                                             <input type="submit" value="Log in" class="btn btn-primary btn-large btn-block" >
                                             <br>
                                         </div>
-                                    {% endif %}
-                                    {% endwith %}
 								</div>
 							</div>
 						</form>
@@ -170,18 +151,6 @@
         </div>
     </div>
     </div>
-
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-           {% for message in messages %}
-               <script type="text/javascript">
-                   $(document).ready(function(){
-                       $("#login-modal").modal('show');
-                   });
-               </script>
-           {% endfor %}
-      {% endif %}
-    {% endwith %}
 <!--Login Modal End-->
 
 <!--Sign-up Modal Start-->

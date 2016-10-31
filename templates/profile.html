@@ -1,0 +1,41 @@
+{% extends 'index.html' %}
+
+{% block content %}
+<div class="">
+    <div class="row profile">
+		<div class="col-md-3 col-sm-3 col-xs-3 col-lg-3" style="padding-left: 30px">
+			<div class="profile-sidebar">
+				<!-- SIDEBAR USERPIC -->
+				<div class="profile-userpic">
+					<img src="{{ url_for('static', filename = 'Spoj.jpg') }}"  height="202" width="202">
+				</div>
+				<!-- END SIDEBAR USERPIC -->
+				<!-- SIDEBAR USER TITLE -->
+				<div class="profile-usertitle">
+					<div class="profile-usertitle-name" style="font-size: 25px; padding-top: 10px;">{{ profile['first_name'] }} {{ profile['last_name'] }}</div>
+					<div class="profile-usertitle-user_name" style="font-size: 20px; padding-bottom: 20px">@{{ profile['user_name'] }}</div>
+					<!--<div style="font-size: 20px">Roll No: {{ profile['roll_no'] }}</div>-->
+				</div>
+				<!-- END SIDEBAR USER TITLE -->
+				<!-- SIDEBAR MENU -->
+				<div class="profile-usermenu">
+				    <a href="{{ url_for('manage_profile') }}" style="padding-left: 5px; font-size: 15px"><i class="glyphicon glyphicon-flag"></i>Manage Account</a>
+				</div>
+				<!-- END MENU -->
+			</div>
+		</div>
+		<div class="col-md-8">
+                <div style="font-family: 'Cuprum', sans-serif; font-size: 24px">Problems Status</div>
+                <div class="progress" style="height: 20px">
+                  <div class="progress-bar progress-bar-success" role="progressbar" style="width:32.42%">Correct Answer</div>
+                  <div class="progress-bar progress-bar-warning" role="progressbar" style="width:4.28%">CTE</div>
+                  <div class="progress-bar progress-bar-danger" role="progressbar" style="width:17.74%">TLE</div>
+                  <div class="progress-bar progress-bar-warning" role="progressbar" style="width:13.46%">SIGSEGV</div>
+                  <div class="progress-bar progress-bar-danger" role="progressbar" style="width:32%">Wrong Answer</div>
+                </div>
+		</div>
+	</div>
+</div>
+<br>
+<br>
+{% endblock %}
