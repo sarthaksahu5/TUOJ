@@ -1,9 +1,22 @@
 {% extends 'index.html' %}
 
 {% block content %}
-    <span>{{ problem['content'] }}</span></br>
-    <form action="{{ url_for('problem', name = problem['problem_name']) }}" method="POST" enctype="multipart/form-data">
-        <input type="file" name="file"><br /><br />
-        <input type="submit" value="Upload Soltution">
-    </form>
+    <div style="font-size: 26px; text-align: center; padding-bottom: 20px">{{ problem['problem_name'] }}</div>
+    <div class="">
+        <pre style="white-space: pre-wrap">{{ problem['content'] }}</pre></br>
+    </div>
+    {% if value == True %}
+        <form action="{{ url_for('problem', name = problem['problem_name']) }}" method="POST" enctype="multipart/form-data">
+            <input type="file" name="file">
+            <select name="language">
+                <option value="C++">C++</option>
+                <option value="Java">Java</option>
+                <option value="Python">Python</option>
+            </select>
+            <span>Choose Language</span></br></br>
+            <input type="submit" value="Upload Soltution">
+        </form>
+    {% else %}
+        <span style="font-size: 18px">Please Login to Submit your solution's</span>
+    {% endif %}
 {% endblock %}
