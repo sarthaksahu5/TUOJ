@@ -180,10 +180,14 @@ def problem(name):
 
         val = os.system('fc wow.txt ' +file2)
 
-        if val:
-            return home()
+        if session.get('logged_in'):
+            value = True
+            user = session['user']
         else:
-            return problems()
+            value = False
+            user = None
+
+        return render_template('Result.html', val = val, value = True, user = user)
 
 '''@app.route('/profile/<username>/manage/', methods=['GET', 'POST'])
 def manage_profile(username):
