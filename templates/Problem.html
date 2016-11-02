@@ -23,7 +23,7 @@
             {% if problem['correct_submissions'] == 0 %}
                 <td>0</td>
             {% else %}
-                <td>{{ problem['total_submissions']/problem['correct_submissions'] }}</td>
+                <td>{{ (problem['correct_submissions']/problem['total_submissions'])*100 }}</td>
             {% endif %}
           </tr>
           {% endfor %}
