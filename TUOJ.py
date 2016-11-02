@@ -1,6 +1,6 @@
 from flask import Flask, flash, redirect, render_template, request, session, url_for, send_from_directory
 from sqlalchemy.orm import sessionmaker
-from models import Register, Problem, Base
+from Project import Register, Problem, Submission, Base
 from sqlalchemy import create_engine
 import os, time, bcrypt
 from werkzeug import secure_filename
@@ -14,7 +14,7 @@ s = Session()
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(APP_ROOT, 'Input/')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['ALLOWED_EXTENSIONS'] = set(['txt', 'java', 'py'])
+app.config['ALLOWED_EXTENSIONS'] = set(['txt', 'java', 'py', 'cpp'])
 app.config['MAX_CONTENT_LENGTH'] = 1 * 1024 * 1024
 
 @app.errorhandler(404)
@@ -25,7 +25,7 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS']
 
-@app.route('/problems')
+@app.route('/problems/')
 def problems():
     if session.get('logged_in'):
         value = True
@@ -35,6 +35,11 @@ def problems():
         user = None
 
     return render_template('Problem.html',problems = s.query(Problem).all(), user = user, value = value)
+
+@app.route('/submissions/')
+def submissions():
+    if session.get('logged_in'):
+        return render_template('submission_history.html',submissions = s.query(Submission).filter_by(user_name = session['user']), user = session['user'], value = True)
 
 @app.route('/upload')
 def index():
@@ -95,17 +100,6 @@ def register():
 
     return home()
 
-'''@app.route('/upload', methods=['POST'])
-def upload():
-    file = request.files['file']
-    if file and allowed_file(file.filename):
-        filename = secure_filename(request.form['problem_id'])
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        return redirect(url_for('uploaded_file', filename=filename))
-    else:
-        flash('file format not supported')
-        return url_for('index.html')'''
-
 @app.route('/uploads', methods=['GET', 'POST'])
 def upload():
 
@@ -123,19 +117,22 @@ def upload():
                 content = request.form['content']
                 tags = request.form['tags']
 
+                app.config['ALLOWED_EXTENSIONS'] = {'txt'}
+
                 file = request.files['file']
                 if file and allowed_file(file.filename):
                     filename = secure_filename(file.filename)
-                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], request.form['problem_name']+'_input.txt'))
+                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], request.form['problem_id']+'_input.txt'))
 
                 file = request.files['file1']
                 if file and allowed_file(file.filename):
                     filename = secure_filename(file.filename)
-                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], request.form['problem_name']+'_output.txt'))
+                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], request.form['problem_id']+'_output.txt'))
 
-                problem = Problem(problem_id, problem_name, difficulty, content, tags)
-                s.add(problem)
-                s.commit()
+                if problem_id != None and problem_name != None and difficulty != None and content != None:
+                    problem = Problem(problem_id, problem_name, difficulty, content, tags)
+                    s.add(problem)
+                    s.commit()
 
                 return home()
 
@@ -163,42 +160,58 @@ def problem(name):
         file = request.files['file']
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            print('yo')
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], 'Main'))
 
         os.chdir('C:\\Users\\Saurav Verma\\Downloads\\Compressed\\flaskSamples\\6-FlaskLogin\\Input')
 
-        a = os.system('javac Main.java')
-        print(a)
-        start_time = time.time()
-        b = os.system('java Main > wow.txt')
-        print(b)
+        b = 0
+        c = 0
+        if( request.form['language'] == 'C++'):
+            os.system('rename Main Main.cpp')
+            a = os.system('g++ Main.cpp -o Main')
+            if( a == 0):
+                b = os.system('Main < '+name+'_input.txt > check.txt')
+                c = os.system('fc '+name+'_output.txt check.txt')
+            os.system('del /f Main.cpp, Main.exe, check.txt')
 
-        '''file1 = name
-        os.system('java '+file1+' < wow.txt')'''
+        if( request.form['language'] == 'Java'):
+            os.system('rename Main Main.java')
+            a = os.system('javac Main.java')
+            if( a == 0):
+                b = os.system('java Main < '+name+'_input.txt > check.txt')
+                c = os.system('fc '+name+'_output.txt check.txt')
+            os.system('del /f Main.java, Main.class, check.txt')
 
-        file2 = name+'_input.txt'
+        if( request.form['language'] == 'Python'):
+            os.system('rename Main Main.py')
+            a = 0
+            b = os.system('python Main.py < '+name+'_input.txt > check.txt')
+            c = os.system('fc '+name+'_output.txt check.txt')
+            os.system('del /f Main, Main.py, check.txt')
 
-        val = os.system('fc wow.txt ' +file2)
-
-        if session.get('logged_in'):
-            value = True
-            user = session['user']
+        if( a==1 ):
+            status = 'CTE'
         else:
-            value = False
-            user = None
+            if( b==1 ):
+                status = 'RE'
+            else:
+                if( c==1 ):
+                    status = 'WA'
+                else:
+                    status = 'AC'
 
-        return render_template('Result.html', val = val, value = True, user = user)
+        submission = Submission(session['user'], name, status)
+        s.add(submission)
+        s.commit()
 
-'''@app.route('/profile/<username>/manage/', methods=['GET', 'POST'])
-def manage_profile(username):
-    if request.method == 'GET':
-        if session.get('logged_in'):
-            return render_template('manage_profile.html', value = True, user = session['user'])
-        else:
-            return home()
-    else:
-'''
+        problem = s.query(Problem).filter_by(problem_id = name).first()
+        problem.total_submissions += 1
+        if( status == 'AC' ):
+            problem.correct_submissions += 1
+        s.commit()
 
+        return render_template('Result.html', a = a, b =b, c = c, value = True, user = session['user'])
 
 @app.route("/logout")
 def logout():
