@@ -1,7 +1,7 @@
 from flask import Flask, flash, redirect, render_template, request, session, url_for, send_from_directory
 from sqlalchemy.orm import sessionmaker
 from Project import Register, Problem, Submission, Base
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, and_, desc
 import os, time, bcrypt
 from werkzeug import secure_filename
 
@@ -39,7 +39,7 @@ def problems():
 @app.route('/submissions/')
 def submissions():
     if session.get('logged_in'):
-        return render_template('submission_history.html',submissions = s.query(Submission).filter_by(user_name = session['user']), user = session['user'], value = True)
+        return render_template('submission_history.html',submissions = s.query(Problem, Submission).filter(Submission.user_name == session['user']).filter(Problem.problem_id == Submission.problem_id).order_by(desc(Submission.submission_time)), user = session['user'], value = True)
 
 @app.route('/upload')
 def index():
@@ -122,17 +122,17 @@ def upload():
                 file = request.files['file']
                 if file and allowed_file(file.filename):
                     filename = secure_filename(file.filename)
-                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], request.form['problem_id']+'_input.txt'))
+                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], request.form['id']+'_input.txt'))
 
                 file = request.files['file1']
                 if file and allowed_file(file.filename):
                     filename = secure_filename(file.filename)
-                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], request.form['problem_id']+'_output.txt'))
+                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], request.form['id']+'_output.txt'))
 
-                if problem_id != None and problem_name != None and difficulty != None and content != None:
-                    problem = Problem(problem_id, problem_name, difficulty, content, tags)
-                    s.add(problem)
-                    s.commit()
+                #if problem_id != None and problem_name != None and difficulty != None and content != None:
+                problem = Problem(problem_id, problem_name, difficulty, content, tags)
+                s.add(problem)
+                s.commit()
 
                 return home()
 
@@ -142,6 +142,62 @@ def upload():
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+@app.route('/problem/<name>/edit/', methods=['GET', 'POST'])
+def edit_question(name):
+    if session.get('logged_in'):
+        if request.method == 'GET':
+            return render_template('edit_question.html', value = True, user = session['user'], problem = s.query(Problem).filter_by(problem_name = name).first())
+        if request.method == 'POST':
+            problem = s.query(Problem).filter_by(problem_name = name).first()
+
+            problem.problem_name = request.form['problem_name']
+            problem.difficulty = request.form['difficulty']
+            problem.content = request.form['content']
+            problem.tags = request.form['tags']
+
+            s.commit()
+
+            app.config['ALLOWED_EXTENSIONS'] = {'txt'}
+            if request.files['file'].filename != '':
+                file = request.files['file']
+                if file and allowed_file(file.filename):
+                    filename = secure_filename(file.filename)
+                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], request.form['id']+'_input.txt'))
+
+            if request.files['file1'].filename != '':
+                file = request.files['file1']
+                if file and allowed_file(file.filename):
+                    filename = secure_filename(file.filename)
+                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], request.form['id']+'_output.txt'))
+
+            return problems()
+
+@app.route('/problem/<name>/delete/', methods=['GET', 'POST'])
+def delete_question(name):
+
+    if session.get('logged_in') and session['user'] == 'admin' :
+        if request.method == 'GET':
+            return render_template('confirm.html', value = True, user = session['user'], name = name)
+
+        if request.method == 'POST':
+            if request.form['choice'] == 'Yes':
+                problem = s.query(Problem).filter_by(problem_name = name).first()
+
+                os.chdir('C:\\Users\\Saurav Verma\\Downloads\\Compressed\\flaskSamples\\6-FlaskLogin\\Input')
+                file = problem.problem_id
+                os.system('del /s '+file+'_input.txt, '+file+'_output.txt')
+
+                s.delete(problem)
+                s.commit()
+
+    return problems()
+
+@app.route('/<user_name>/<int:id>')
+def submission(user_name, id):
+
+    if session.get('logged_in'):
+        return render_template('problem_solution.html', value = True, user = session['user'], solution = s.query(Submission).filter_by(submission_no = id).first())
 
 @app.route('/problem/<name>/', methods=['GET', 'POST'])
 def problem(name):
@@ -160,15 +216,17 @@ def problem(name):
         file = request.files['file']
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            print('yo')
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], 'Main'))
 
         os.chdir('C:\\Users\\Saurav Verma\\Downloads\\Compressed\\flaskSamples\\6-FlaskLogin\\Input')
 
+        os.system('rename Main Main.txt')
+        file_string = open('Main.txt', 'r').read()
+
         b = 0
         c = 0
         if( request.form['language'] == 'C++'):
-            os.system('rename Main Main.cpp')
+            os.system('rename Main.txt Main.cpp')
             a = os.system('g++ Main.cpp -o Main')
             if( a == 0):
                 b = os.system('Main < '+name+'_input.txt > check.txt')
@@ -176,7 +234,7 @@ def problem(name):
             os.system('del /f Main.cpp, Main.exe, check.txt')
 
         if( request.form['language'] == 'Java'):
-            os.system('rename Main Main.java')
+            os.system('rename Main.txt Main.java')
             a = os.system('javac Main.java')
             if( a == 0):
                 b = os.system('java Main < '+name+'_input.txt > check.txt')
@@ -184,7 +242,7 @@ def problem(name):
             os.system('del /f Main.java, Main.class, check.txt')
 
         if( request.form['language'] == 'Python'):
-            os.system('rename Main Main.py')
+            os.system('rename Main.txt Main.py')
             a = 0
             b = os.system('python Main.py < '+name+'_input.txt > check.txt')
             c = os.system('fc '+name+'_output.txt check.txt')
@@ -201,7 +259,7 @@ def problem(name):
                 else:
                     status = 'AC'
 
-        submission = Submission(session['user'], name, status)
+        submission = Submission(session['user'], name, status, request.form['language'], file_string)
         s.add(submission)
         s.commit()
 
