@@ -1,4 +1,4 @@
-from sqlalchemy import ForeignKey, Column, String, INTEGER, DateTime, Float, TEXT
+from sqlalchemy import ForeignKey, Column, String, INTEGER, DateTime, Float, TEXT, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
@@ -69,14 +69,14 @@ class Problem(Base):
     correct_submissions = Column(INTEGER, default=0)
     tags = Column(String, nullable=False)
 
-    def __init__(self, problem_id, problem_name, difficulty, content, tags):
+    def __init__(self, problem_id, problem_name, difficulty, content, tags, total_submissions = 0, correct_submissions = 0):
         self.problem_id = problem_id
         self.problem_name = problem_name
         self.difficulty = difficulty
         self.content = content
         self.tags = tags
-        self.total_submissions = 0
-        self.correct_submissions = 0
+        self.total_submissions = total_submissions
+        self.correct_submissions = correct_submissions
 
 class Submission(Base):
     __tablename__ = 'submission'
@@ -87,13 +87,18 @@ class Submission(Base):
     problem_id = Column(String, ForeignKey('problem.problem_id'))
     problem = relationship(Problem)
     status = Column(String, nullable=False)
-    submission_time = Column(DateTime, nullable=False, default=datetime.now())
+    submission_time = Column(DateTime, nullable=False)
+    language_used = Column(String(6), nullable=False)
+    solution = Column(String, nullable=False)
     memory_used = (Float)
 
-    def __init__(self, user_name, problem_id, status):
+    def __init__(self, user_name, problem_id, status, language_used, solution):
         self.user_name = user_name
         self.problem_id = problem_id
         self.status = status
+        self.submission_time = datetime.now()
+        self.language_used = language_used
+        self.solution = solution
 
 engine = create_engine('sqlite:///tuoj.db')
 Base.metadata.create_all(engine)
