@@ -1,6 +1,6 @@
 from flask import Flask, flash, redirect, render_template, request, session, url_for, send_from_directory
 from sqlalchemy.orm import sessionmaker
-from Project import Register, Problem, Submission, Base
+from Project import Register, Problem, Submission, Profile, Base
 from sqlalchemy import create_engine, and_, desc
 import os, time, bcrypt
 from werkzeug import secure_filename
@@ -54,7 +54,15 @@ def index():
 
 @app.route('/profile/<username>')
 def profile(username):
-    return render_template('profile.html', user = session['user'], value = True, profile = s.query(Register).filter_by(user_name = session['user']).first())
+    if session.get('logged_in'):
+        profile = s.query(Register).filter_by(user_name = session['user']).first()
+        profile1 = s.query(Profile).filter_by(user_name = session['user']).first()
+        total = profile1.Correct_Answer+profile1.WA+profile1.RE+profile1.TLE+profile1.CTE
+        print(total)
+        if total == 0:
+            total = 1
+
+        return render_template('profile.html', user = session['user'], value = True, profile = profile, profile1 = profile1, total = total)
 
 @app.route('/')
 def home():
@@ -94,8 +102,12 @@ def register():
     POST_PASSWORD = request.form['password']
 
     register = Register(POST_USERNAME, POST_ROLLNO, POST_FNAME, POST_LNAME, POST_COLLEGE, POST_EMAIL, POST_PASSWORD.encode('utf-8'))
-    s.add(register)
+    profile = Profile(POST_USERNAME)
 
+    s.add(register)
+    s.commit()
+
+    s.add(profile)
     s.commit()
 
     return home()
@@ -248,16 +260,22 @@ def problem(name):
             c = os.system('fc '+name+'_output.txt check.txt')
             os.system('del /f Main, Main.py, check.txt')
 
+        profile = s.query(Profile).filter_by(user_name = session['user']).first()
+
         if( a==1 ):
             status = 'CTE'
+            profile.CTE += 1
         else:
             if( b==1 ):
                 status = 'RE'
+                profile.RE += 1
             else:
                 if( c==1 ):
                     status = 'WA'
+                    profile.WA += 1
                 else:
                     status = 'AC'
+                    profile.Correct_Answer += 1
 
         submission = Submission(session['user'], name, status, request.form['language'], file_string)
         s.add(submission)
