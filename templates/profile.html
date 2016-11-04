@@ -13,13 +13,12 @@
 				<!-- SIDEBAR USER TITLE -->
 				<div class="profile-usertitle">
 					<div class="profile-usertitle-name" style="font-size: 25px; padding-top: 10px;">{{ profile['first_name'] }} {{ profile['last_name'] }}</div>
-					<div class="profile-usertitle-user_name" style="font-size: 20px; padding-bottom: 20px">@{{ profile['user_name'] }}</div>
-					<!--<div style="font-size: 20px">Roll No: {{ profile['roll_no'] }}</div>-->
+					<div class="profile-usertitle-user_name" style="font-size: 20px; padding-bottom: 5px">@{{ profile['user_name'] }}</div>
+					<div style="font-size: 20px; padding-bottom: 10px">{{ profile['roll_no'] }}</div>
 				</div>
 				<!-- END SIDEBAR USER TITLE -->
-				<!-- SIDEBAR MENU -->
 				<div class="profile-usermenu">
-				    <a href="{{ url_for('manage_profile') }}" style="padding-left: 5px; font-size: 15px"><i class="glyphicon glyphicon-flag"></i>Manage Account</a>
+				    <a href="{{ url_for('manage_profile', name = profile['user_name']) }}" style="padding-left: 5px; font-size: 15px"><i class="glyphicon glyphicon-flag"></i>Manage Account</a>
 				</div>
 				<!-- END MENU -->
 			</div>
