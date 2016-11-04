@@ -42,19 +42,17 @@ class Profile(Base):
     uid = Column(INTEGER, autoincrement=True, primary_key=True)
     user_name = Column(String, ForeignKey('register.user_name'))
     register = relationship('Register')
-    city = Column(String)
     CTE = Column(INTEGER, default=0)
     TLE = Column(INTEGER, default=0)
-    SIGSEGV = Column(INTEGER, default=0)
+    RE = Column(INTEGER, default=0)
     WA = Column(INTEGER, default=0)
     Correct_Answer = Column(INTEGER, default=0)
 
-    def __init__(self, user_name, city, CTE=0, TLE=0, SIGSEGV=0, WA=0, Correct_Answer=0):
+    def __init__(self, user_name, CTE=0, TLE=0, RE=0, WA=0, Correct_Answer=0):
         self.user_name = user_name
-        self.city = city
         self.CTE = CTE
         self.TLE = TLE
-        self.SIGSEGV = SIGSEGV
+        self.RE = RE
         self.WA = WA
         self.Correct_Answer = Correct_Answer
 
