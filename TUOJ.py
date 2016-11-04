@@ -271,6 +271,25 @@ def problem(name):
 
         return render_template('Result.html', a = a, b =b, c = c, value = True, user = session['user'])
 
+@app.route('/profile/<name>/manage/', methods=['GET', 'POST'])
+def manage_profile(name):
+    if session.get('logged_in') and name == session['user'] :
+        if request.method == 'GET':
+            return render_template('manage_profile.html', value = True, user = session['user'], profile = s.query(Register).filter_by(user_name = name).first())
+
+        else:
+            profile = s.query(Register).filter_by(user_name = name).first()
+
+            profile.roll_no = request.form['roll_no']
+            profile.first_name = request.form['first_name']
+            profile.last_name = request.form['last_name']
+            profile.college = request.form['college']
+
+            s.commit()
+
+            return home()
+
+
 @app.route("/logout")
 def logout():
     session['logged_in'] = False
