@@ -26,11 +26,11 @@
 		<div class="col-md-8">
                 <div style="font-family: 'Cuprum', sans-serif; font-size: 24px">Problems Status</div>
                 <div class="progress" style="height: 20px">
-                  <div class="progress-bar progress-bar-success" role="progressbar" style="width:32.42%">Correct Answer</div>
-                  <div class="progress-bar progress-bar-warning" role="progressbar" style="width:4.28%">CTE</div>
-                  <div class="progress-bar progress-bar-danger" role="progressbar" style="width:17.74%">TLE</div>
-                  <div class="progress-bar progress-bar-warning" role="progressbar" style="width:13.46%">SIGSEGV</div>
-                  <div class="progress-bar progress-bar-danger" role="progressbar" style="width:32%">Wrong Answer</div>
+                  <div class="progress-bar progress-bar-success" role="progressbar" style="width:{{ (profile1['Correct_Answer']/total)*100 }}%">Correct Answer</div>
+                  <div class="progress-bar progress-bar-warning" role="progressbar" style="width:{{ (profile1['CTE']/total)*100 }}%">CTE</div>
+                  <div class="progress-bar progress-bar-danger" role="progressbar" style="width:{{ (profile1['TLE']/total)*100 }}%">TLE</div>
+                  <div class="progress-bar progress-bar-warning" role="progressbar" style="width:{{ (profile1['RE']/total)*100 }}%">SIGSEGV</div>
+                  <div class="progress-bar progress-bar-danger" role="progressbar" style="width:{{ (profile1['WA']/total)*100 }}%">Wrong Answer</div>
                 </div>
 		</div>
 	</div>
