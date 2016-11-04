@@ -1,0 +1,14 @@
+{% extends 'index.html' %}
+
+{% block content %}
+    <div>
+        <form action="{{ url_for('delete_question', name = name) }}" method="POST">
+            <span style="padding-right: 20px">Are you sure you want to delete, {{ name }} </span>
+            <select name="choice";>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+            </select><br>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+{% endblock %}
