@@ -9,19 +9,20 @@
         <thead>
           <tr>
             <th class="col-lg-2 col-md-2 col-sm-2 col-xs-2">Id</th>
-            <th class="col-lg-4 col-md-4 col-sm-4 col-xs-4">Name</th>
+            <th class="col-lg-4 col-md-4 col-sm-4 col-xs-4">Problem Name</th>
+            <th class="col-lg-2 col-md-2 col-sm-2 col-xs-2">Language Used</th>
             <th class="col-lg-2 col-md-2 col-sm-2 col-xs-2">Status</th>
-            <th class="col-lg-2 col-md-2 col-sm-2 col-xs-2">Date</th>
-            <!--<th>Language</th>-->
+            <th>Date </th>
           </tr>
         </thead>
         <tbody>
-          {% for submission in submissions %}
+          {% for problem, submission in submissions %}
           <tr>
             <td>{{ submission['submission_no'] }}</td>
-            <td>{{ submission['problem_id'] }}</td>
+            <td><a href="{{ url_for('problem', name = problem['problem_name']) }}">{{ problem['problem_name'] }}</a></td>
+            <td><a href="{{ url_for('submission', user_name = user, id = submission['submission_no']) }}">{{ submission['language_used'] }}</a></td>
             <td>{{ submission['status'] }}</td>
-            <td>{{ submission['submission_time'] }}</td>
+            <td>{{ submission['submission_time'].strftime("%d-%m-%Y %H:%M:%S") }}</td>
           </tr>
           {% endfor %}
         </tbody>

@@ -40,6 +40,7 @@
     </head>
 
     <body>
+    <div style="width: 98%; padding-left: 20px">
         <div class="row">
             <div class="container col-xs-6 col-md-6 col-sm-6 col-lg-6" >
                 <span style="font-size:50px; font-family: 'Kaushan Script', cursive;">T</span><span style="font-size: 20px; font-family: 'Kaushan Script', cursive;">hapar </span>
@@ -83,7 +84,7 @@
                                             <li role="presentation"><a role="menuitem" tabindex="-1" href="{{ url_for('upload') }}"><strong>Upload Problem</strong></a></li>
                                         {% endif %}
                                         <li role="presentation"><a role="menuitem" tabindex="-1" href="#"><strong>Manage profile</strong></a></li>
-                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#"><strong>Submission history</strong></a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="{{ url_for('submissions') }}"><strong>Submission history</strong></a></li>
                                         <!--<li role="presentation" class="divider"></li>
                                         <li role="presentation"><a role="menuitem" tabindex="-1" href="#">About Us</a></li>-->
                                     </ul></li>
@@ -233,5 +234,6 @@
     </script>
 <!--Sign-up Modal End-->
 
+    </div>
 	</body>
 </html>

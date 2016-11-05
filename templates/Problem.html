@@ -23,7 +23,7 @@
             {% if problem['correct_submissions'] == 0 %}
                 <td>0</td>
             {% else %}
-                <td>{{ (problem['correct_submissions']/problem['total_submissions'])*100 }}</td>
+                <td>{{ ((problem['correct_submissions']/problem['total_submissions'])*100)|round(2) }}</td>
             {% endif %}
           </tr>
           {% endfor %}
