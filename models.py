@@ -99,4 +99,4 @@ class Submission(Base):
         self.solution = solution
 
 engine = create_engine('sqlite:///tuoj.db')
-Base.metadata.create_all(engine)
+#Base.metadata.create_all(engine)

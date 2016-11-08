@@ -1,11 +1,11 @@
 from flask import Flask, flash, redirect, render_template, request, session, url_for, send_from_directory
 from sqlalchemy.orm import sessionmaker
-from Project import Register, Problem, Submission, Profile, Base
+from models import Register, Problem, Submission, Profile, Base
 from sqlalchemy import create_engine, and_, desc
 import os, time, bcrypt
 from werkzeug import secure_filename
 
-engine = create_engine('sqlite:///C:\\Users\\Saurav Verma\\Downloads\\Compressed\\flaskSamples\\6-FlaskLogin\\tuoj.db')
+engine = create_engine('sqlite:///C:\\Users\\Sarthak Sahu\\PycharmProjects\\TUOJ\\tuoj.db')
 app = Flask(__name__)
 
 Session = sessionmaker(bind=engine)
@@ -196,7 +196,7 @@ def delete_question(name):
             if request.form['choice'] == 'Yes':
                 problem = s.query(Problem).filter_by(problem_name = name).first()
 
-                os.chdir('C:\\Users\\Saurav Verma\\Downloads\\Compressed\\flaskSamples\\6-FlaskLogin\\Input')
+                os.chdir('C:\\Users\\Sarthak Sahu\\PycharmProjects\\TUOJ\\Input')
                 file = problem.problem_id
                 os.system('del /s '+file+'_input.txt, '+file+'_output.txt')
 
@@ -230,8 +230,8 @@ def problem(name):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], 'Main'))
 
-        os.chdir('C:\\Users\\Saurav Verma\\Downloads\\Compressed\\flaskSamples\\6-FlaskLogin\\Input')
-
+        os.chdir('C:\\Users\\Sarthak Sahu\\PycharmProjects\\TUOJ\\Input')
+        print(5)
         os.system('rename Main Main.txt')
         file_string = open('Main.txt', 'r').read()
 
@@ -241,8 +241,8 @@ def problem(name):
             os.system('rename Main.txt Main.cpp')
             a = os.system('g++ Main.cpp -o Main')
             if( a == 0):
-                b = os.system('Main < '+name+'_input.txt > check.txt')
-                c = os.system('fc '+name+'_output.txt check.txt')
+                b = os.system('Main < '+ name + 'input.txt > check.txt')
+                c = os.system('fc '+ name +'_output.txt check.txt')
             os.system('del /f Main.cpp, Main.exe, check.txt')
 
         if( request.form['language'] == 'Java'):
