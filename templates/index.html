@@ -79,11 +79,11 @@
                                 <li><button class="btn btn-default center-block dropdown-toggle" type="button" id="menu1" data-toggle="dropdown" style="font-family: 'Cuprum', sans-serif; background-color: transparent; outline: none; border: none; margin-top: 8.5px"><strong>Hello, {{ user }}
                                 </strong><span class="caret"></span></button>
                                     <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
-                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="{{ url_for('profile', username = user) }}"><strong>Profile</strong></a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="{{ url_for('profile', username =  user) }}"><strong>Profile</strong></a></li>
                                         {% if user == 'admin' %}
                                             <li role="presentation"><a role="menuitem" tabindex="-1" href="{{ url_for('upload') }}"><strong>Upload Problem</strong></a></li>
                                         {% endif %}
-                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#"><strong>Manage profile</strong></a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href={{ url_for('manage_profile',name = user)}}><strong>Manage profile</strong></a></li>
                                         <li role="presentation"><a role="menuitem" tabindex="-1" href="{{ url_for('submissions') }}"><strong>Submission history</strong></a></li>
                                         <!--<li role="presentation" class="divider"></li>
                                         <li role="presentation"><a role="menuitem" tabindex="-1" href="#">About Us</a></li>-->
