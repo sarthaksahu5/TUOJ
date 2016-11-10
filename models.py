@@ -31,10 +31,12 @@ class Register(Base):
         self.email = email
         self.password = hashed_pw
 
+
     def valid_email(email):
         if not re.match("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$", email):
             return False
         return True
+
 
 class Profile(Base):
     __tablename__ = 'profile'

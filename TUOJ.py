@@ -1,21 +1,34 @@
 from flask import Flask, flash, redirect, render_template, request, session, url_for, send_from_directory
 from sqlalchemy.orm import sessionmaker
-from models import Register, Problem, Submission, Profile, Base
-from sqlalchemy import create_engine, and_, desc
 import os, time, bcrypt
+from sqlalchemy import *
 from werkzeug import secure_filename
+from MySQLdb import escape_string as thwart
+from models import *
+import gc
+import MySQLdb
 
-engine = create_engine('sqlite:///C:\\Users\\Sarthak Sahu\\PycharmProjects\\TUOJ\\tuoj.db')
 app = Flask(__name__)
-
-Session = sessionmaker(bind=engine)
-s = Session()
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(APP_ROOT, 'Input/')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['ALLOWED_EXTENSIONS'] = set(['txt', 'java', 'py', 'cpp'])
 app.config['MAX_CONTENT_LENGTH'] = 1 * 1024 * 1024
+
+'''###############################################################
+            UTILITY FUNCTIONS
+###############################################################'''
+
+
+def connection():
+    conn = MySQLdb.connect(host="localhost",
+                           user="root",
+                           passwd="",
+                           db="tuoj")
+    c = conn.cursor()
+
+    return c, conn
 
 '''###############################################################
             DEALING WITH ERROR HANDLING
@@ -55,44 +68,82 @@ def home():
 @app.route('/login', methods=['POST'])
 def do_admin_login():
 
+
     POST_USERNAME = str(request.form['username'])
     POST_PASSWORD = request.form['password']
+    try:
+        # Connection to the database
+        c, conn = connection()
+        # Checking for record in database
+        x = c.execute("SELECT * FROM register where user_name = %s", POST_USERNAME)
 
-    Session = sessionmaker(bind=engine)
-    s = Session()
-    query = s.query(Register).filter(Register.user_name.in_([POST_USERNAME])).first()
-
-    if query:
-        if bcrypt.hashpw(POST_PASSWORD.encode('utf-8'), query.password) == query.password:
-            session['logged_in'] = True
-            session['user'] = POST_USERNAME
-        else:
-            flash('Wrong Password')
-
-    return home()
-
+        if int(x) > 0:
+            if bcrypt.hashpw(POST_PASSWORD.encode('utf-8'), x.password) == x.password:
+                session['logged_in'] = True
+                session['user'] = POST_USERNAME
+                flash("You are now Logged In !")
+            else:
+                flash('Wrong Password')
+        c.close()
+        conn.close()
+        gc.collect()
+        return home()
+    except Exception as e:
+        return str(e)
 
 @app.route('/register', methods=['POST'])
 def register():
+    try:
+        POST_USERNAME = request.form['username']
+        POST_ROLLNO = request.form['rollno']
+        POST_FNAME = request.form['fname']
+        POST_LNAME = request.form['lname']
+        POST_COLLEGE = request.form['college']
+        POST_EMAIL = request.form['email']
+        POST_PASSWORD = request.form['password']
 
-    POST_USERNAME = request.form['username']
-    POST_ROLLNO   = request.form['rollno']
-    POST_FNAME    = request.form['fname']
-    POST_LNAME    = request.form['lname']
-    POST_COLLEGE  = request.form['college']
-    POST_EMAIL    = request.form['email']
-    POST_PASSWORD = request.form['password']
+        # Connection to the database
+        c, conn = connection()
 
-    register = Register(POST_USERNAME, POST_ROLLNO, POST_FNAME, POST_LNAME, POST_COLLEGE, POST_EMAIL, POST_PASSWORD.encode('utf-8'))
-    profile = Profile(POST_USERNAME)
+        # Making the password a hash
+        salt = bcrypt.gensalt()
+        hashed_pw = bcrypt.hashpw(POST_PASSWORD, salt)
 
-    s.add(register)
-    s.commit()
+        # Checking for already existing record in database
+        x = c.execute("SELECT * FROM register where user_name = %s", (POST_USERNAME))
+        if int(x) > 0:
+            flash("That username is already taken !")
+            return home()
 
-    s.add(profile)
-    s.commit()
+        # If the table doesn't contain the record, then put the record into the table.
+        else:
+            c.execute("INSERT INTO register VALUES (%s, %s, %s, %s,%s,%s,%s)",
+                      (
+                          thwart(POST_USERNAME),
+                          thwart(POST_ROLLNO),
+                          thwart(POST_FNAME),
+                          thwart(POST_LNAME),
+                          thwart(POST_COLLEGE),
+                          thwart(POST_EMAIL),
+                          thwart(hashed_pw)
+                      )
+                      )
+            conn.commit()
+            # Generate the profile of the user whenever a user registers.
+            c.execute("INSERT INTO profile VALUES (%s)",
+                      (
+                          thwart(POST_USERNAME)
+                      )
+                      )
+            conn.commit()
+            flash("Thanks For Registering !")
+            c.close()
+            conn.close()
+            gc.collect()
+            return home()
 
-    return home()
+    except Exception as e:
+        return str(e)
 
 
 @app.route('/<user_name>/<int:id>')
