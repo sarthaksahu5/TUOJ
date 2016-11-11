@@ -279,7 +279,7 @@ def delete_question(name):
             if request.method == 'POST':
                 if request.form['choice'] == 'Yes':
                     os.chdir('C:\\Users\\Sarthak Sahu\\PycharmProjects\\TUOJ\\Input')
-                    file = problem.problem_id
+                    file = problem[0]
                     os.system('del /s ' + file + '_input.txt, ' + file + '_output.txt')
                     c.execute("DELETE problem where problem_name = '{0}'".format(name))
                     conn.commit()
@@ -316,10 +316,17 @@ def problems():
 @app.route('/submissions/')
 def submissions():
     if session.get('logged_in'):
-        return render_template('submission_history.html', submissions=s.query(Problem, Submission).filter(
-            Submission.user_name == session['user']).filter(Problem.problem_id == Submission.problem_id).order_by(
-            desc(Submission.submission_time)), user=session['user'], value=True)
-
+        try:
+            # Connection to the database
+            c, conn = connection()
+            c.execute("SELECT * FROM problem, submission where submission.user_name = '{0}' and problem.problem_id = submission.problem_id order by submission.submission_time desc".format(session['user']))
+            submissions = c.fetchall()
+            c.close()
+            conn.close()
+            gc.collect()
+            return render_template('submission_history.html', submissions=submissions, user=session['user'], value=True)
+        except Exception as e:
+            return str(e)
 
 @app.route('/upload')
 def index():
@@ -350,33 +357,47 @@ def upload():
 
     else:
         if session['user'] == 'admin':
-            if request.method == 'GET':
-                return render_template('uploads.html', user=session['user'], value=True)
-            if request.method == 'POST':
-                problem_id = request.form['id']
-                problem_name = request.form['problem_name']
-                difficulty = request.form['difficulty']
-                content = request.form['content']
-                tags = request.form['tags']
+            try:
+                # Connection to the database
+                c, conn = connection()
 
-                app.config['ALLOWED_EXTENSIONS'] = {'txt'}
+                if request.method == 'GET':
+                    return render_template('uploads.html', user=session['user'], value=True)
+                if request.method == 'POST':
+                    problem_id = request.form['id']
+                    problem_name = request.form['problem_name']
+                    difficulty = request.form['difficulty']
+                    content = request.form['content']
+                    tags = request.form['tags']
 
-                file = request.files['file']
-                if file and allowed_file(file.filename):
-                    filename = secure_filename(file.filename)
-                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], request.form['id'] + '_input.txt'))
+                    app.config['ALLOWED_EXTENSIONS'] = {'txt'}
 
-                file = request.files['file1']
-                if file and allowed_file(file.filename):
-                    filename = secure_filename(file.filename)
-                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], request.form['id'] + '_output.txt'))
+                    file = request.files['file']
+                    if file and allowed_file(file.filename):
+                        filename = secure_filename(file.filename)
+                        file.save(os.path.join(app.config['UPLOAD_FOLDER'], request.form['id'] + '_input.txt'))
 
-                # if problem_id != None and problem_name != None and difficulty != None and content != None:
-                problem = Problem(problem_id, problem_name, difficulty, content, tags)
-                s.add(problem)
-                s.commit()
+                    file = request.files['file1']
+                    if file and allowed_file(file.filename):
+                        filename = secure_filename(file.filename)
+                        file.save(os.path.join(app.config['UPLOAD_FOLDER'], request.form['id'] + '_output.txt'))
 
-                return home()
+                    # if problem_id != None and problem_name != None and difficulty != None and content != None:
+                    c.execute("INSERT INTO problem(problem_id,problem_name,difficulty,content,tags) VALUES ('{0}','{1}', '{2}','{3}','{4}')".format(
+                          thwart(problem_id),
+                          thwart(problem_name),
+                          thwart(difficulty),
+                          thwart(content),
+                          thwart(tags)
+                        )
+                    )
+                    conn.commit()
+                    c.close()
+                    conn.close()
+                    gc.collect()
+                    return home()
+            except Exception as e:
+                return str(e)
 
         else:
             return home()
@@ -389,82 +410,117 @@ def uploaded_file(filename):
 
 @app.route('/problem/<name>/', methods=['GET', 'POST'])
 def problem(name):
-    if request.method == 'GET':
 
-        if session.get('logged_in'):
-            value = True
-            user = session['user']
-        else:
-            value = False
-            user = None
-        return render_template('problems.html', problem=s.query(Problem).filter_by(problem_name=name).first(),
-                               value=value, user=user)
+    try:
+        # Connection to the database
+        c, conn = connection()
+        c.execute("SELECT * FROM problem where problem_name = '{0}'".format(name))
+        problem = c.fetchone()
+        
+        if request.method == 'GET':
 
-    if request.method == 'POST':
-
-        file = request.files['file']
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], 'Main'))
-
-        os.chdir('C:\\Users\\Sarthak Sahu\\PycharmProjects\\TUOJ\\Input')
-        print(5)
-        os.system('rename Main Main.txt')
-        file_string = open('Main.txt', 'r').read()
-
-        b = 0
-        c = 0
-        if ( request.form['language'] == 'C++'):
-            os.system('rename Main.txt Main.cpp')
-            a = os.system('g++ Main.cpp -o Main')
-            if ( a == 0):
-                b = os.system('Main < ' + name + 'input.txt > check.txt')
-                c = os.system('fc ' + name + '_output.txt check.txt')
-            os.system('del /f Main.cpp, Main.exe, check.txt')
-
-        if ( request.form['language'] == 'Java'):
-            os.system('rename Main.txt Main.java')
-            a = os.system('javac Main.java')
-            if ( a == 0):
-                b = os.system('java Main < ' + name + '_input.txt > check.txt')
-                c = os.system('fc ' + name + '_output.txt check.txt')
-            os.system('del /f Main.java, Main.class, check.txt')
-
-        if ( request.form['language'] == 'Python'):
-            os.system('rename Main.txt Main.py')
-            a = 0
-            b = os.system('python Main.py < ' + name + '_input.txt > check.txt')
-            c = os.system('fc ' + name + '_output.txt check.txt')
-            os.system('del /f Main, Main.py, check.txt')
-
-        profile = s.query(Profile).filter_by(user_name=session['user']).first()
-
-        if ( a == 1 ):
-            status = 'CTE'
-            profile.CTE += 1
-        else:
-            if ( b == 1 ):
-                status = 'RE'
-                profile.RE += 1
+            if session.get('logged_in'):
+                value = True
+                user = session['user']
             else:
-                if ( c == 1 ):
-                    status = 'WA'
-                    profile.WA += 1
+                value = False
+                user = None
+            return render_template('problems.html', problem=problem, value=value, user=user)
+
+        if request.method == 'POST':
+
+            file = request.files['file']
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], 'Main'))
+
+            os.chdir('C:\\Users\\Sarthak Sahu\\PycharmProjects\\TUOJ\\Input')
+            print(5)
+            os.system('rename Main Main.txt')
+            file_string = open('Main.txt', 'r').read()
+
+            b = 0
+            c = 0
+            if ( request.form['language'] == 'C++'):
+                os.system('rename Main.txt Main.cpp')
+                a = os.system('g++ Main.cpp -o Main')
+                if ( a == 0):
+                    b = os.system('Main < ' + name + 'input.txt > check.txt')
+                    c = os.system('fc ' + name + '_output.txt check.txt')
+                os.system('del /f Main.cpp, Main.exe, check.txt')
+
+            if ( request.form['language'] == 'Java'):
+                os.system('rename Main.txt Main.java')
+                a = os.system('javac Main.java')
+                if ( a == 0):
+                    b = os.system('java Main < ' + name + '_input.txt > check.txt')
+                    c = os.system('fc ' + name + '_output.txt check.txt')
+                os.system('del /f Main.java, Main.class, check.txt')
+
+            if ( request.form['language'] == 'Python'):
+                os.system('rename Main.txt Main.py')
+                a = 0
+                b = os.system('python Main.py < ' + name + '_input.txt > check.txt')
+                c = os.system('fc ' + name + '_output.txt check.txt')
+                os.system('del /f Main, Main.py, check.txt')
+
+            c.execute("SELECT * FROM profile WHERE user_name = '{0}'".format(session['user']))
+            profile = c.fetchone()
+
+            if ( a == 1 ):
+                status = 'CTE'
+                CTE = profile[2]
+                CTE += 1
+                c.execute("UPDATE profile set CTE = '{0}'".format(CTE))
+                conn.commit()
+            else:
+                if ( b == 1 ):
+                    status = 'RE'
+                    RE = profile[2]
+                    RE += 1
+                    c.execute("UPDATE profile set RE = '{0}'".format(RE))
+                    conn.commit()
                 else:
-                    status = 'AC'
-                    profile.Correct_Answer += 1
+                    if ( c == 1 ):
+                        status = 'WA'
+                        WA = profile[2]
+                        WA += 1
+                        c.execute("UPDATE profile set WA = '{0}'".format(WA))
+                        conn.commit()
+                    else:
+                        status = 'AC'
+                        Correct_Answer = profile[2]
+                        Correct_Answer += 1
+                        c.execute("UPDATE profile set Correct_Answer = '{0}'".format(Correct_Answer))
+                        conn.commit()
 
-        submission = Submission(session['user'], name, status, request.form['language'], file_string)
-        s.add(submission)
-        s.commit()
-
-        problem = s.query(Problem).filter_by(problem_id=name).first()
-        problem.total_submissions += 1
-        if ( status == 'AC' ):
-            problem.correct_submissions += 1
-        s.commit()
-
-        return render_template('Result.html', a=a, b=b, c=c, value=True, user=session['user'])
+            c.execute("INSERT INTO submission(user_name, problem_id, status, language_used, solution) VALUES ('{0}','{1}', '{2}','{3}','{4}')".format(
+                          thwart(session['user']),
+                          thwart(name),
+                          thwart(status),
+                          thwart(request.form['language']),
+                          thwart(file_string)
+                        )
+                    )
+            conn.commit()
+            c.execute("SELECT * FROM problem where problem_id = '{0}'".format(name))
+            problem = c.fetchone()
+            total_submissions = problem[4]
+            total_submissions += 1
+            c.execute("UPDATE problem set total_submissions = '{0}'".format(total_submissions))
+            conn.commit()
+            if ( status == 'AC' ):
+                correct_submissions = problem[5]
+                correct_submissions += 1
+                c.execute("UPDATE problem set correct_submissions = '{0}'".format(correct_submissions))
+                conn.commit()
+            c.close()
+            conn.close()
+            gc.collect()
+            return render_template('Result.html', a=a, b=b, c=c, value=True, user=session['user'])
+    
+    except Exception as e:
+        return str(e)
 
 
 if __name__ == "__main__":
