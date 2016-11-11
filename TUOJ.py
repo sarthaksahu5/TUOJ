@@ -286,8 +286,9 @@ def delete_question(name):
 
             c.close()
             conn.close()
+            gc.collect()
             return problems()
-            
+
         except Exception as e:
             return str(e)
 
@@ -300,9 +301,17 @@ def problems():
     else:
         value = False
         user = None
-
-    return render_template('Problem.html', problems=s.query(Problem).all(), user=user, value=value)
-
+    try:
+        # Connection to the database
+        c, conn = connection()
+        c.execute("SELECT * FROM problem")
+        problems = c.fetchall()
+        c.close()
+        conn.close()
+        gc.collect()
+        return render_template('Problem.html', problems=problems, user=user, value=value)
+    except Exception as e:
+        return str(e)
 
 @app.route('/submissions/')
 def submissions():

@@ -17,13 +17,13 @@
         <tbody>
           {% for problem in problems %}
           <tr>
-            <td>{{ problem['problem_id'] }}</td>
-            <td><a href="{{ url_for('problem', name = problem['problem_name']) }}">{{ problem['problem_name'] }}</a></td>
-            <td>{{ problem['total_submissions'] }}</td>
-            {% if problem['correct_submissions'] == 0 %}
+            <td>{{ problem[0] }}</td>
+            <td><a href="{{ url_for('problem', name = problem[1]) }}">{{ problem[1] }}</a></td>
+            <td>{{ problem[4] }}</td>
+            {% if problem[5] == 0 %}
                 <td>0</td>
             {% else %}
-                <td>{{ ((problem['correct_submissions']/problem['total_submissions'])*100)|round(2) }}</td>
+                <td>{{ ((problem[5]/problem[4])*100)|round(2) }}</td>
             {% endif %}
           </tr>
           {% endfor %}
