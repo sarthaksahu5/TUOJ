@@ -1,0 +1,30 @@
+{% extends 'index.html' %}
+
+{% block content %}
+    <div style="text-align: center" >
+        <span style="font-size: 26px">{{ problem['problem_name'] }}</span>
+    </div>
+    {% if user == 'admin' %}
+        <div style="text-align: center; font-size: 16px">
+            <span style="padding-right: 5px"><a href="{{ url_for('edit_question', name = problem['problem_name'] ) }}">Edit</a></span>
+            <span style="padding-left: 5px"><a href="{{ url_for('delete_question', name = problem['problem_name']) }}">Delete</a></span>
+        </div>
+    {% endif %}
+    <div class="">
+        <pre style="white-space: pre-wrap; text-align: left">{{ problem['content'] }}</pre></br>
+    </div>
+    {% if value == True %}
+        <form action="{{ url_for('problem', name = problem['problem_id']) }}" method="POST" enctype="multipart/form-data">
+            <input type="file" name="file">
+            <select name="language">
+                <option value="C++">C++</option>
+                <option value="Java">Java</option>
+                <option value="Python">Python</option>
+            </select>
+            <span>Choose Language</span></br></br>
+            <input type="submit" value="Upload Soltution">
+        </form>
+    {% else %}
+        <span style="font-size: 18px">Please Login to Submit your solution's</span>
+    {% endif %}
+{% endblock %}

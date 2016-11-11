@@ -1,0 +1,46 @@
+{% extends 'index.html' %}
+
+{% block content %}
+<div class="">
+    <div class="row profile">
+		<div class="col-md-3 col-sm-3 col-xs-3 col-lg-3" style="padding-left: 30px">
+			<div class="profile-sidebar">
+				<!-- SIDEBAR USERPIC -->
+				<div class="profile-userpic">
+					<img src="{{ url_for('static', filename = 'Spoj.jpg') }}"  height="202" width="202">
+				</div>
+				<!-- END SIDEBAR USERPIC -->
+				<!-- SIDEBAR USER TITLE -->
+				<div class="profile-usertitle">
+					<div class="profile-usertitle-name" style="font-size: 25px; padding-top: 10px;">
+					{{ register_obj[2] }} {{ register_obj[3] }}</div>
+					<div class="profile-usertitle-user_name" style="font-size: 20px; padding-bottom: 5px">@{{ register_obj[0] }}</div>
+					<div style="font-size: 20px; padding-bottom: 10px">{{ register_obj[1] }}</div>
+				</div>
+				<!-- END SIDEBAR USER TITLE -->
+				<div class="profile-usermenu">
+				    <a href="{{ url_for('manage_profile', name = register_obj[0]) }}" style="padding-left: 5px; font-size: 15px"><i class="glyphicon glyphicon-flag"></i>Manage Account</a>
+				</div>
+				<!-- END MENU -->
+			</div>
+		</div>
+		<div class="col-md-8">
+                <div style="font-family: 'Cuprum', sans-serif; font-size: 24px">Problems Status</div>
+                <div class="progress" style="height: 20px">
+                  <div class="progress-bar progress-bar-success" role="progressbar" style="width:{{ 
+                  	(profile_obj[6]/total)*100 }}%">Correct Answer</div>
+                  <div class="progress-bar progress-bar-warning" role="progressbar" style="width:{{ 
+                  	(profile_obj[2]/total)*100 }}%">CTE</div>
+                  <div class="progress-bar progress-bar-danger" role="progressbar" style="width:{{ 
+                  	(profile_obj[3]/total)*100 }}%">TLE</div>
+                  <div class="progress-bar progress-bar-warning" role="progressbar" style="width:{{ 
+                  	(profile_obj[4]/total)*100 }}%">SIGSEGV</div>
+                  <div class="progress-bar progress-bar-danger" role="progressbar" style="width:{{ 
+                  	(profile_obj[5]/total)*100 }}%">Wrong Answer</div>
+                </div>
+		</div>
+	</div>
+</div>
+<br>
+<br>
+{% endblock %}

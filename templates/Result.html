@@ -1,0 +1,17 @@
+{% extends 'index.html' %}
+
+{% block content %}
+    {% if a == 1 %}
+        <span>Compile Time Error(CTE)!</span>
+    {% else %}
+        {% if b == 1 %}
+            <span>Runtime Error(RE)!</span>
+        {% else %}
+            {% if c == 1 %}
+                <span>Wrong Answer(WA)!</span>
+            {% else %}
+                <span>Correct Answer(AC)!!</span>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+{% endblock %}

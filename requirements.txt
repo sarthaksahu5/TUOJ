@@ -1,0 +1,8 @@
+flask
+pymysql
+flask-sqlalchemy
+flask-script
+flask-wtf
+py-bcrypt
+mysql-python
+flask-login

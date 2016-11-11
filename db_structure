@@ -1,0 +1,39 @@
+problem
+
+1 	problem_id
+2 	problem_name
+3 	difficulty 
+4 	content 	
+5 	total_submissions 	
+6 	correct_submissions 
+7 	tags 
+
+profile
+
+1   uid
+2   user_name
+3   CTE     
+4   TLE     
+5   RE  
+6   WA  
+7   Correct_Answer
+
+register
+
+1   user_name
+2   roll_no
+3   first_name
+4   last_name 
+5   college   
+6   email
+7   password
+
+submission
+
+1   submission_no
+2   user_name
+3   problem_id
+4   status 
+5   submission_time 
+6   language_used  
+7   solution

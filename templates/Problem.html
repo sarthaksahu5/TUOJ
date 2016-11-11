@@ -1,0 +1,33 @@
+{% extends 'index.html' %}
+
+{% block content %}
+    <div class="container col-xs-3 col-md-3 col-sm-3 col-lg-3" style="margin-bottom: 25px">
+        <span style="font-size: 26px; font-family: 'Sanchez', serif; text-align: left">Problems</span>
+    </div>
+    <div class="" style="padding: 13px">
+      <table class="table table-condensed table-hover table-striped">
+        <thead>
+          <tr>
+            <th class="col-lg-2 col-md-2 col-sm-2 col-xs-2">Id</th>
+            <th class="col-lg-6 col-md-6 col-sm-6 col-xs-6">Name</th>
+            <th class="col-lg-2 col-md-2 col-sm-2 col-xs-2">Total Submissions</th>
+            <th>Accuracy %</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for problem in problems %}
+          <tr>
+            <td>{{ problem['problem_id'] }}</td>
+            <td><a href="{{ url_for('problem', name = problem['problem_name']) }}">{{ problem['problem_name'] }}</a></td>
+            <td>{{ problem['total_submissions'] }}</td>
+            {% if problem['correct_submissions'] == 0 %}
+                <td>0</td>
+            {% else %}
+                <td>{{ ((problem['correct_submissions']/problem['total_submissions'])*100)|round(2) }}</td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+{% endblock %}
