@@ -259,7 +259,7 @@ def edit_question(name):
                         file.save(os.path.join(app.config['UPLOAD_FOLDER'], request.form['id'] + '_output.txt'))
 
                 return problems()
-                
+
             except Exception as e:
                 return str(e)
 
@@ -267,21 +267,29 @@ def edit_question(name):
 @app.route('/problem/<name>/delete/', methods=['GET', 'POST'])
 def delete_question(name):
     if session.get('logged_in') and session['user'] == 'admin':
-        if request.method == 'GET':
-            return render_template('confirm.html', value=True, user=session['user'], name=name)
+        try:
+            # Connection to the database
+            c, conn = connection()
+            c.execute("SELECT * FROM problem where problem_name = '{0}'".format(name))
+            problem = c.fetchone()
 
-        if request.method == 'POST':
-            if request.form['choice'] == 'Yes':
-                problem = s.query(Problem).filter_by(problem_name=name).first()
+            if request.method == 'GET':
+                return render_template('confirm.html', value=True, user=session['user'], name=name)
 
-                os.chdir('C:\\Users\\Sarthak Sahu\\PycharmProjects\\TUOJ\\Input')
-                file = problem.problem_id
-                os.system('del /s ' + file + '_input.txt, ' + file + '_output.txt')
+            if request.method == 'POST':
+                if request.form['choice'] == 'Yes':
+                    os.chdir('C:\\Users\\Sarthak Sahu\\PycharmProjects\\TUOJ\\Input')
+                    file = problem.problem_id
+                    os.system('del /s ' + file + '_input.txt, ' + file + '_output.txt')
+                    c.execute("DELETE problem where problem_name = '{0}'".format(name))
+                    conn.commit()
 
-                s.delete(problem)
-                s.commit()
-
-    return problems()
+            c.close()
+            conn.close()
+            return problems()
+            
+        except Exception as e:
+            return str(e)
 
 
 @app.route('/problems/')
