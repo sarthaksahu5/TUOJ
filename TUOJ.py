@@ -217,33 +217,51 @@ def logout():
 @app.route('/problem/<name>/edit/', methods=['GET', 'POST'])
 def edit_question(name):
     if session.get('logged_in'):
-        if request.method == 'GET':
-            return render_template('edit_question.html', value=True, user=session['user'],
-                                   problem=s.query(Problem).filter_by(problem_name=name).first())
-        if request.method == 'POST':
-            problem = s.query(Problem).filter_by(problem_name=name).first()
+        try:
+            # Connection to the database
+            c, conn = connection()
+            c.execute("SELECT * FROM problem where problem_name = '{0}'".format(name))
+            problem = c.fetchone() 
+            if request.method == 'GET':
+                return render_template('edit_question.html', value=True, user=session['user'],
+                                       problem=problem)
+            if request.method == 'POST':
 
-            problem.problem_name = request.form['problem_name']
-            problem.difficulty = request.form['difficulty']
-            problem.content = request.form['content']
-            problem.tags = request.form['tags']
+                update_pname = request.form['problem_name']
+                update_pdifficulty = request.form['difficulty']
+                update_pcontent = request.form['content']
+                update_ptags = request.form['tags']
 
-            s.commit()
+                c.execute("UPDATE problem SET problem_name = '{0}', difficulty = '{1}', content = '{2}', tags = '{3}' where problem_name = '{4}'".format
+                    (
+                        thwart(update_pname),
+                        thwart(update_pdifficulty),
+                        thwart(update_pcontent),
+                        thwart(update_ptags),
+                        name
+                    )
+                )
+                conn.commit()
+                c.close()
+                conn.close()
 
-            app.config['ALLOWED_EXTENSIONS'] = {'txt'}
-            if request.files['file'].filename != '':
-                file = request.files['file']
-                if file and allowed_file(file.filename):
-                    filename = secure_filename(file.filename)
-                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], request.form['id'] + '_input.txt'))
+                app.config['ALLOWED_EXTENSIONS'] = {'txt'}
+                if request.files['file'].filename != '':
+                    file = request.files['file']
+                    if file and allowed_file(file.filename):
+                        filename = secure_filename(file.filename)
+                        file.save(os.path.join(app.config['UPLOAD_FOLDER'], request.form['id'] + '_input.txt'))
 
-            if request.files['file1'].filename != '':
-                file = request.files['file1']
-                if file and allowed_file(file.filename):
-                    filename = secure_filename(file.filename)
-                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], request.form['id'] + '_output.txt'))
+                if request.files['file1'].filename != '':
+                    file = request.files['file1']
+                    if file and allowed_file(file.filename):
+                        filename = secure_filename(file.filename)
+                        file.save(os.path.join(app.config['UPLOAD_FOLDER'], request.form['id'] + '_output.txt'))
 
-            return problems()
+                return problems()
+                
+            except Exception as e:
+                return str(e)
 
 
 @app.route('/problem/<name>/delete/', methods=['GET', 'POST'])
