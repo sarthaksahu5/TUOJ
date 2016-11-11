@@ -12,34 +12,40 @@
                     <!-- END SIDEBAR USERPIC -->
                     <!-- SIDEBAR USER TITLE -->
                     <div class="profile-usertitle">
-                        <div class="profile-usertitle-name" style="font-size: 25px; padding-top: 10px;">{{ profile['first_name'] }} {{ profile['last_name'] }}</div>
-                        <div class="profile-usertitle-user_name" style="font-size: 20px; padding-bottom: 5px">@{{ profile['user_name'] }}</div>
-                        <div style="font-size: 20px; padding-bottom: 10px">{{ profile['roll_no'] }}</div>
+                        <div class="profile-usertitle-name" style="font-size: 25px; padding-top: 10px;">
+                            {{ register_obj[2] }} {{ register_obj[3] }}</div>
+                        <div class="profile-usertitle-user_name" style="font-size: 20px; padding-bottom: 5px">      @{{ register_obj[0] }}
+                        </div>
+                        <div style="font-size: 20px; padding-bottom: 10px">{{ register_obj[1] }}</div>
                     </div>
                     <!-- END SIDEBAR USER TITLE -->
                     <div class="profile-usermenu">
-                        <a href="{{ url_for('manage_profile', name = profile['user_name']) }}" style="padding-left: 5px; font-size: 15px"><i class="glyphicon glyphicon-flag"></i>Manage Account</a>
+                        <a href="{{ url_for('manage_profile', name = register_obj[0]) }}" style="padding-left: 5px; font-size: 15px"><i class="glyphicon glyphicon-flag"></i>Manage Account</a>
                     </div>
                     <!-- END MENU -->
                 </div>
             </div>
             <div class="col-md-8">
-                <form action="{{url_for('manage_profile', name = profile['user_name'])}}" method="POST">
+                <form action="{{url_for('manage_profile', name = register_obj[0])}}" method="POST">
                     <div class="form-group">
                       <label for="id">Roll No.</label>
-                      <input type="integer" class="form-control" name="roll_no" value="{{ profile['roll_no'] }}">
+                      <input type="integer" class="form-control" name="roll_no" value="
+                      {{ register_obj[1] }}">
                     </div>
                     <div class="form-group">
                       <label for="problem_name">First Name</label>
-                      <input type="text" class="form-control" name="first_name" value="{{ profile['first_name'] }}">
+                      <input type="text" class="form-control" name="first_name" value="
+                      {{ register_obj[2] }}">
                     </div>
                     <div class="form-group">
                       <label for="difficulty">Last Name</label>
-                      <input type="text" class="form-control" name="last_name" value="{{ profile['last_name'] }}">
+                      <input type="text" class="form-control" name="last_name" value="
+                      {{ register_obj[3] }}">
                     </div>
                     <div class="form-group">
                       <label for="content">College</label>
-                      <input type="text" class="form-control" name="college" value="{{ profile['college'] }}">
+                      <input type="text" class="form-control" name="college" value="
+                      {{ register_obj[4] }}">
                     </div>
                     <input type="submit" value="Submit">
                 </form>

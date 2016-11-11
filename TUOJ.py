@@ -168,20 +168,39 @@ def submission(user_name, id):
 @app.route('/profile/<name>/manage/', methods=['GET', 'POST'])
 def manage_profile(name):
     if session.get('logged_in') and name == session['user'] :
-        if request.method == 'GET':
-            return render_template('manage_profile.html', value = True, user = session['user'], profile = s.query(Register).filter_by(user_name = name).first())
+        try:
+            # Connection to the database
+            c, conn = connection()
+            # Getting the record from database
+            c.execute("SELECT * FROM register where user_name = '{0}'".format(name))
+            register_obj = c.fetchone()
 
-        else:
-            profile = s.query(Register).filter_by(user_name = name).first()
+            if request.method == 'GET':
+                return render_template('manage_profile.html', value = True, user = session['user'], register_obj = register_obj)
 
-            profile.roll_no = request.form['roll_no']
-            profile.first_name = request.form['first_name']
-            profile.last_name = request.form['last_name']
-            profile.college = request.form['college']
+            else:
+                update_rollno = request.form['roll_no']
+                update_fname = request.form['first_name']
+                update_lname = request.form['last_name']
+                update_college = request.form['college']
 
-            s.commit()
-
-            return home()
+                # updating the table in the database
+                c.execute("UPDATE register SET roll_no = '{0}',first_name = '{1}',last_name = '{2}',college = '{3}' where user_name = '{4}'".format
+                    (
+                        thwart(update_rollno),
+                        thwart(update_fname),
+                        thwart(update_lname),
+                        thwart(update_college),
+                        name
+                    )
+                )
+                conn.commit()
+                c.close()
+                conn.close()
+                gc.collect()
+                return home()
+        except Exception as e:
+            return str(e)
 
 
 @app.route("/logout")
