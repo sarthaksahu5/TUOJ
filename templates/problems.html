@@ -11,7 +11,7 @@
         </div>
     {% endif %}
     <div class="">
-        <pre style="white-space: pre-wrap; text-align: left">{{ problem['content'] }}</pre></br>
+        <pre style="white-space: pre-wrap; text-align: left">{{ problem[3] }}</pre></br>
     </div>
     {% if value == True %}
         <form action="{{ url_for('problem', name = problem[0]) }}" method="POST" enctype="multipart/form-data">
@@ -22,9 +22,9 @@
                 <option value="Python">Python</option>
             </select>
             <span>Choose Language</span></br></br>
-            <input type="submit" value="Upload Soltution">
+            <input type="submit" value="Upload Solution">
         </form>
     {% else %}
-        <span style="font-size: 18px">Please Login to Submit your solution's</span>
+        <span style="font-size: 18px">Please Login to Submit your solutions !</span>
     {% endif %}
 {% endblock %}

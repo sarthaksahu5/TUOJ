@@ -16,14 +16,14 @@
           </tr>
         </thead>
         <tbody>
-          {% for problem, submission in submissions %}
+          {% for submission in submissions %}
           <tr>
-            <td>{{ submission[0] }}</td>
-            <td><a href="{{ url_for('problem', name = problem[1]) }}">{{ problem[1] }}</a></td>
-            <td><a href="{{ url_for('submission', user_name = user, id = submission[0]) }}">{{
-             submission[5] }}</a></td>
-            <td>{{ submission[3] }}</td>
-            <td>{{ submission[4].strftime("%d-%m-%Y %H:%M:%S") }}</td>
+            <td>{{ submission['submission_no'] }}</td>
+            <td><a href="{{ url_for('problem', name = submission['problem_name']) }}">{{ submission['problem_name'] }}</a></td>
+            <td><a href="{{ url_for('submission', user_name = user, id = submission['submission_no']) }}">{{
+             submission['language_used'] }}</a></td>
+            <td>{{ submission['status'] }}</td>
+            <td>{{ submission['submission_time'].strftime("%d-%m-%Y %H:%M:%S") }}</td>
           </tr>
           {% endfor %}
         </tbody>

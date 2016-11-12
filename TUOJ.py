@@ -30,6 +30,14 @@ def connection():
 
     return c, conn
 
+
+def dict_factory(cursor, row):
+    d = {}
+    for idx, col in enumerate(cursor.description):
+        d[col[0]] = row[idx]
+    return d
+
+
 '''###############################################################
             DEALING WITH ERROR HANDLING
 ###############################################################'''
@@ -162,8 +170,13 @@ def register():
 def submission(user_name, id):
 
     if session.get('logged_in'):
-        return render_template('problem_solution.html', value = True, user = session['user'], solution = s.query(Submission).filter_by(submission_no = id).first())
-
+        try:
+            c,conn = connection()
+            c.execute("SELECT * FROM submission WHERE submission_no = '{0}'".format(id))
+            solution = c.fetchone()
+            return render_template('problem_solution.html', value = True, user = session['user'], solution = solution)
+        except Exception as e:
+            return str(e)
 
 @app.route('/profile/<name>/manage/', methods=['GET', 'POST'])
 def manage_profile(name):
@@ -260,8 +273,8 @@ def edit_question(name):
 
                 return problems()
 
-            except Exception as e:
-                return str(e)
+        except Exception as e:
+            return str(e)
 
 
 @app.route('/problem/<name>/delete/', methods=['GET', 'POST'])
@@ -278,9 +291,9 @@ def delete_question(name):
 
             if request.method == 'POST':
                 if request.form['choice'] == 'Yes':
-                    os.chdir('C:\\Users\\Sarthak Sahu\\PycharmProjects\\TUOJ\\Input')
+                    os.chdir('/home/sarthak/Desktop/TUOJ/Input')
                     file = problem[0]
-                    os.system('del /s ' + file + '_input.txt, ' + file + '_output.txt')
+                    os.system('rm /s ' + file + '_input.txt, ' + file + '_output.txt')
                     c.execute("DELETE problem where problem_name = '{0}'".format(name))
                     conn.commit()
 
@@ -319,6 +332,7 @@ def submissions():
         try:
             # Connection to the database
             c, conn = connection()
+            c = conn.cursor(MySQLdb.cursors.DictCursor)
             c.execute("SELECT * FROM problem, submission where submission.user_name = '{0}' and problem.problem_id = submission.problem_id order by submission.submission_time desc".format(session['user']))
             submissions = c.fetchall()
             c.close()
@@ -434,35 +448,35 @@ def problem(name):
                 filename = secure_filename(file.filename)
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], 'Main'))
 
-            os.chdir('C:\\Users\\Sarthak Sahu\\PycharmProjects\\TUOJ\\Input')
+            os.chdir('/home/sarthak/Desktop/TUOJ/Input')
             print(5)
-            os.system('rename Main Main.txt')
+            os.system('mv Main Main.txt')
             file_string = open('Main.txt', 'r').read()
 
-            b = 0
-            c = 0
+            B = 0
+            C = 0
             if ( request.form['language'] == 'C++'):
-                os.system('rename Main.txt Main.cpp')
+                os.system('mv Main.txt Main.cpp')
                 a = os.system('g++ Main.cpp -o Main')
                 if ( a == 0):
-                    b = os.system('Main < ' + name + 'input.txt > check.txt')
-                    c = os.system('fc ' + name + '_output.txt check.txt')
-                os.system('del /f Main.cpp, Main.exe, check.txt')
+                    B = os.system('Main < ' + name + 'input.txt > check.txt')
+                    C = os.system('fc ' + name + '_output.txt check.txt')
+                os.system('rm Main.cpp, Main.exe, check.txt')
 
             if ( request.form['language'] == 'Java'):
-                os.system('rename Main.txt Main.java')
+                os.system('mv Main.txt Main.java')
                 a = os.system('javac Main.java')
                 if ( a == 0):
-                    b = os.system('java Main < ' + name + '_input.txt > check.txt')
-                    c = os.system('fc ' + name + '_output.txt check.txt')
-                os.system('del /f Main.java, Main.class, check.txt')
+                    B = os.system('java Main < ' + name + '_input.txt > check.txt')
+                    C = os.system('fc ' + name + '_output.txt check.txt')
+                os.system('rm /f Main.java, Main.class, check.txt')
 
             if ( request.form['language'] == 'Python'):
-                os.system('rename Main.txt Main.py')
+                os.system('mv Main.txt Main.py')
                 a = 0
-                b = os.system('python Main.py < ' + name + '_input.txt > check.txt')
-                c = os.system('fc ' + name + '_output.txt check.txt')
-                os.system('del /f Main, Main.py, check.txt')
+                B = os.system('python Main.py < ' + name + '_input.txt > check.txt')
+                C = os.system('fc ' + name + '_output.txt check.txt')
+                os.system('rm /f Main, Main.py, check.txt')
 
             c.execute("SELECT * FROM profile WHERE user_name = '{0}'".format(session['user']))
             profile = c.fetchone()
@@ -471,27 +485,27 @@ def problem(name):
                 status = 'CTE'
                 CTE = profile[2]
                 CTE += 1
-                c.execute("UPDATE profile set CTE = '{0}'".format(CTE))
+                c.execute("UPDATE profile set CTE = '{0}' WHERE user_name = '{1}'".format(CTE,session['user']))
                 conn.commit()
             else:
-                if ( b == 1 ):
+                if ( B == 1 ):
                     status = 'RE'
                     RE = profile[2]
                     RE += 1
-                    c.execute("UPDATE profile set RE = '{0}'".format(RE))
+                    c.execute("UPDATE profile set RE = '{0}' WHERE user_name = '{1}'".format(RE,session['user']))
                     conn.commit()
                 else:
-                    if ( c == 1 ):
+                    if ( C == 1 ):
                         status = 'WA'
                         WA = profile[2]
                         WA += 1
-                        c.execute("UPDATE profile set WA = '{0}'".format(WA))
+                        c.execute("UPDATE profile set WA = '{0}' WHERE user_name = '{1}'".format(WA,session['user']))
                         conn.commit()
                     else:
                         status = 'AC'
                         Correct_Answer = profile[2]
                         Correct_Answer += 1
-                        c.execute("UPDATE profile set Correct_Answer = '{0}'".format(Correct_Answer))
+                        c.execute("UPDATE profile set Correct_Answer = '{0}' WHERE user_name = '{1}'".format(Correct_Answer,session['user']))
                         conn.commit()
 
             c.execute("INSERT INTO submission(user_name, problem_id, status, language_used, solution) VALUES ('{0}','{1}', '{2}','{3}','{4}')".format(
@@ -517,7 +531,7 @@ def problem(name):
             c.close()
             conn.close()
             gc.collect()
-            return render_template('Result.html', a=a, b=b, c=c, value=True, user=session['user'])
+            return render_template('Result.html', a=a, B=B, C=C, value=True, user=session['user'])
     
     except Exception as e:
         return str(e)
